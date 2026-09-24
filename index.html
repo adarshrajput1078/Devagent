@@ -65,14 +65,12 @@
     <div class="bg-glow glow-2"></div>
     <div id="toast"><i id="toastIcon"></i> <span id="toastMsg"></span></div>
 
-    <!-- MAIN GATEWAY UI -->
     <div class="gateway-box">
         <div class="logo-wrapper">
             <div class="logo-ring"></div>
             <img src="Logo.png" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/9322/9322127.png'">
         </div>
         
-        <!-- FONT ANIMATING TEXT -->
         <div class="dev-agent-text">DEV AGENT TEAM</div>
         <p class="sub-text">Unified Secure Gateway</p>
         
@@ -103,7 +101,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // LIVE GITHUB BASE URL (Trailing slash included)
+        // LIVE GITHUB BASE URL
         const BASE_URL = "https://adarshrajput1078.github.io/Devagent/";
 
         window.showToast = function(msg, type="success") {
@@ -131,12 +129,12 @@
                     showToast("God Mode Activated", "success");
                     setTimeout(() => {
                         localStorage.setItem('activeSessionPin', pin);
+                        // IMPORTANT: Ensure your file on Github is named exactly Head.html
                         window.location.href = BASE_URL + 'Head.html'; 
                     }, 1200);
                     return; 
                 }
 
-                // NORMAL USERS (Teacher & Agent)
                 const snapshot = await get(ref(db, 'users/' + pin));
                 
                 if (snapshot.exists()) {
