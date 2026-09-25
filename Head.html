@@ -7,7 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- STRICT AUTH GUARD: Live GitHub URL Redirect -->
+    <!-- EXCEL SHEETJS LIBRARY -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- STRICT AUTH GUARD -->
     <script>
         if (!localStorage.getItem('activeSessionPin')) {
             window.location.replace('https://adarshrajput1078.github.io/Devagent/index.html');
@@ -55,10 +58,9 @@
 
         .app-bar { height: 75px; background: rgba(5,5,5,0.9); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; border-bottom: 1px solid var(--border); z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
         .app-bar .icon-btn { background: transparent; color: var(--primary); font-size: 26px; cursor: pointer; transition: 0.2s; }
-        .app-bar .icon-btn:hover { text-shadow: 0 0 15px var(--primary); transform: scale(1.1); }
         .app-bar .brand { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;}
         
-        /* Drawer */
+        /* Drawer Sidebar */
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 60; opacity: 0; pointer-events: none; transition: 0.3s; }
         .drawer-overlay.active { opacity: 1; pointer-events: all; }
         .drawer { position: fixed; top: 0; left: -300px; width: 290px; height: 100vh; background: #050505; border-right: 1px solid var(--border); z-index: 65; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: 10px 0 40px rgba(0,0,0,0.9); }
@@ -85,7 +87,6 @@
         .stat-box { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.05); padding: 25px 15px; border-radius: 16px; text-align: center; position: relative; overflow: hidden; transition: 0.3s; }
         .stat-box::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:var(--primary); opacity: 0.5; transition: 0.3s; }
         .stat-box:hover::before { opacity: 1; background: var(--primary); }
-        .stat-box:hover { background: rgba(251,191,36,0.05); border-color: var(--primary); }
         .stat-box p { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin-bottom: 8px; letter-spacing: 1px;}
         .stat-box h3 { font-size: 32px; color: white; font-weight: 900; font-family: monospace; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
 
@@ -102,6 +103,13 @@
         .btn-app { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: #000; border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: 0 10px 25px var(--primary-glow); text-transform: uppercase; letter-spacing: 1.5px; }
         .btn-app:active { transform: translateY(2px); box-shadow: 0 5px 10px var(--primary-glow); }
 
+        /* Excel Upload Specific */
+        .excel-upload-box { background: rgba(251, 191, 36, 0.05); border: 1px dashed var(--gold); border-radius: 16px; padding: 30px; text-align: center; margin-bottom: 30px; transition: 0.3s; }
+        .excel-upload-box:hover { background: rgba(251, 191, 36, 0.1); border-style: solid; box-shadow: 0 0 20px rgba(251,191,36,0.2); }
+        .excel-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 900; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-outline:hover { background: var(--gold); color: #000; box-shadow: 0 5px 15px var(--gold-glow); }
+
         /* Data Tables & Controls */
         .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .search-bar { background: #000; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 12px 15px; color: white; width: 100%; max-width: 300px; font-size: 14px; font-weight: 600; }
@@ -116,14 +124,10 @@
         /* Action Buttons */
         .btn-action { padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 900; cursor: pointer; transition: 0.2s; border: none; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; }
         .btn-export { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
-        .btn-export:hover { background: var(--success); color: #000; }
         .btn-print { background: rgba(59, 130, 246, 0.15); color: var(--info); border: 1px solid var(--info); }
-        .btn-print:hover { background: var(--info); color: #000; }
         .btn-ban { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-ban:hover { background: var(--danger); color: white; }
         .btn-unban { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
         .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .btn-delete:hover { background: var(--danger); color: white; }
         .btn-pin { background: transparent; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.2); padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .btn-pin.active { background: rgba(251, 191, 36, 0.2); color: var(--primary); border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
 
@@ -133,7 +137,7 @@
 
         .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(30px) rotateX(-5deg); } to { opacity: 1; transform: translateY(0) rotateX(0); } }
-        .delay-1 { animation-delay: 0.1s; } 
+        .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; }
     </style>
 </head>
 <body>
@@ -172,7 +176,7 @@
                 <li class="nav-item" data-target="tab-create"><i class="fas fa-user-shield"></i> Network Access</li>
                 <li class="nav-item" data-target="tab-chat-approvals"><i class="fas fa-comments"></i> Chat Approvals</li>
                 <li class="nav-item" data-target="tab-uids"><i class="fas fa-id-card"></i> UID Registry</li>
-                <li class="nav-item" data-target="tab-dataentry"><i class="fas fa-pen-nib"></i> 19-Column Input</li>
+                <li class="nav-item" data-target="tab-dataentry"><i class="fas fa-pen-nib"></i> Ledger & Excel Sync</li>
                 <li class="nav-item" data-target="tab-livedata"><i class="fas fa-database"></i> Live Database</li>
                 <li class="nav-item" data-target="tab-settings" style="color:var(--danger); border-top:1px solid rgba(255,255,255,0.05); margin-top:10px;"><i class="fas fa-skull"></i> System Wipe</li>
             </ul>
@@ -251,7 +255,6 @@
             <div id="tab-chat-approvals" class="app-tab hidden">
                 <div class="card fade-in" style="padding: 20px 0;">
                     <div class="card-title" style="padding: 0 25px 15px;"><i class="fas fa-comments" style="color: var(--info);"></i> Chat Authorizations</div>
-                    <p style="padding: 0 25px 15px; font-size: 13px; color: var(--text-muted); font-weight:600;">Approve Teacher-to-Agent chat permissions for active tickets.</p>
                     <div class="table-wrap">
                         <table>
                             <thead><tr><th>TICKET ID</th><th>AGENT</th><th>UID / ISSUE</th><th>CHAT CONTROL</th></tr></thead>
@@ -280,10 +283,26 @@
                 </div>
             </div>
 
-            <!-- 6. Full 19-Column Input -->
+            <!-- 6. Full 19-Column Input & Bulk Excel Upload -->
             <div id="tab-dataentry" class="app-tab hidden">
-                <div class="card fade-in">
-                    <div class="card-title"><i class="fas fa-database"></i> 19-Column Master Ledger</div>
+                
+                <!-- NEW: EXCEL BULK UPLOAD SECTION -->
+                <div class="card fade-in excel-upload-box">
+                    <i class="fas fa-file-excel" style="font-size: 50px; color: var(--gold); margin-bottom: 15px;"></i>
+                    <h3 style="font-size: 20px; font-weight: 900; color: white; text-transform: uppercase; margin-bottom: 5px;">Bulk Data Sync (Excel / CSV)</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); font-weight: 600; line-height: 1.5;">Update 100+ agents instantly. Download the template, fill the exact columns, and upload it back to sync with the Firebase Database automatically.</p>
+                    
+                    <div class="excel-actions">
+                        <button class="btn-outline" onclick="window.downloadExcelTemplate()"><i class="fas fa-download"></i> Get Template</button>
+                        
+                        <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display: none;" onchange="window.handleExcelUpload(event)">
+                        <button class="btn-app" style="width: auto; padding: 14px 24px;" onclick="document.getElementById('excelFileInput').click()"><i class="fas fa-upload"></i> Upload & Sync Data</button>
+                    </div>
+                </div>
+
+                <!-- OR MANUAL ENTRY -->
+                <div class="card fade-in delay-1">
+                    <div class="card-title" style="color:var(--text-muted); font-size:14px;"><i class="fas fa-keyboard"></i> Or Manual Single Entry</div>
                     <form id="dataEntryForm">
                         <div class="input-group">
                             <label>1. SELECT AGENT UID (Auto-syncs from registry)</label>
@@ -388,7 +407,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Security Authentication Process
         const sessionPin = localStorage.getItem('activeSessionPin');
         const loader = document.getElementById('vipLoader');
         const mainApp = document.getElementById('mainApp');
@@ -405,34 +423,25 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Verify Firebase Session instantly
+        // Verify Firebase Session
         if(sessionPin) {
             get(ref(db, 'users/' + sessionPin)).then((snapshot) => {
                 if(snapshot.exists() && snapshot.val().role === 'head') {
                     loader.style.opacity = '0';
-                    setTimeout(() => { 
-                        loader.style.display = 'none'; 
-                        mainApp.style.opacity = '1';
-                    }, 500);
+                    setTimeout(() => { loader.style.display = 'none'; mainApp.style.opacity = '1'; }, 500);
                     initHeadData(); 
                 } else {
                     localStorage.removeItem('activeSessionPin');
                     window.location.replace(BASE_URL + 'index.html');
                 }
-            }).catch(() => {
-                window.location.replace(BASE_URL + 'index.html');
-            });
-        } else {
-            window.location.replace(BASE_URL + 'index.html');
-        }
+            }).catch(() => { window.location.replace(BASE_URL + 'index.html'); });
+        } else { window.location.replace(BASE_URL + 'index.html'); }
 
-        // Logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('activeSessionPin');
             window.location.replace(BASE_URL + 'index.html');
         });
 
-        // Nav
         const toggleMenu = () => {
             document.getElementById('sideDrawer').classList.toggle('active');
             document.getElementById('drawerOverlay').classList.toggle('active');
@@ -460,7 +469,6 @@
                 showToast("Global Broadcast Updated!");
                 e.target.reset();
             });
-            
             onValue(ref(db, 'system_config/marquee'), (snapshot) => {
                 if(snapshot.exists()) document.getElementById('flashMessageDisplay').innerText = snapshot.val();
             });
@@ -493,16 +501,7 @@
                             const btnClass = d.status === 'active' ? 'btn-ban' : 'btn-unban';
                             const btnText = d.status === 'active' ? '<i class="fas fa-ban"></i> Ban' : '<i class="fas fa-check"></i> Unban';
                             const newStatus = d.status === 'active' ? 'banned' : 'active';
-                            tbody.innerHTML += `
-                                <tr>
-                                    <td style="font-weight:900; color:white; font-size:16px; font-family:monospace;">${id}</td>
-                                    <td style="text-transform:uppercase; font-weight:800; color:var(--info);">${d.role}</td>
-                                    <td><span class="badge ${d.status === 'active' ? 'badge-positive' : 'badge-negative'}">${d.status}</span></td>
-                                    <td>
-                                        <button class="btn-action ${btnClass}" onclick="window.toggleBan('${id}', '${newStatus}')">${btnText}</button>
-                                        <button class="btn-action btn-delete" style="margin-left:8px;" onclick="window.deleteUser('${id}')"><i class="fas fa-trash-alt"></i></button>
-                                    </td>
-                                </tr>`;
+                            tbody.innerHTML += `<tr><td style="font-weight:900; color:white; font-size:16px; font-family:monospace;">${id}</td><td style="text-transform:uppercase; font-weight:800; color:var(--info);">${d.role}</td><td><span class="badge ${d.status === 'active' ? 'badge-positive' : 'badge-negative'}">${d.status}</span></td><td><button class="btn-action ${btnClass}" onclick="window.toggleBan('${id}', '${newStatus}')">${btnText}</button><button class="btn-action btn-delete" style="margin-left:8px;" onclick="window.deleteUser('${id}')"><i class="fas fa-trash-alt"></i></button></td></tr>`;
                         }
                     });
                 }
@@ -520,25 +519,13 @@
                         if (['Pending', 'Checking', 'Processing'].includes(t.status || 'Pending')) {
                             hasTickets = true; pendingCount++;
                             if(!t.chat_approved) chatReqsCount++;
-
                             const isApproved = t.chat_approved === true;
-                            const btnHtml = isApproved 
-                                ? `<button class="btn-action btn-unban" onclick="window.toggleChatApproval('${id}', false)"><i class="fas fa-lock"></i> Revoke</button>`
-                                : `<button class="btn-action" style="background:var(--info); color:white;" onclick="window.toggleChatApproval('${id}', true)"><i class="fas fa-unlock"></i> Authorize Chat</button>`;
-
-                            tbody.innerHTML += `
-                                <tr>
-                                    <td style="font-weight:900; font-family:monospace; color:white;">#${id.substring(1, 7).toUpperCase()}</td>
-                                    <td style="font-weight:800;">${t.agent_pin || 'N/A'}</td>
-                                    <td><span style="color:var(--warning); font-weight:800;">${t.uid}</span><br><span style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">${t.type}</span></td>
-                                    <td>${btnHtml}</td>
-                                </tr>
-                            `;
+                            const btnHtml = isApproved ? `<button class="btn-action btn-unban" onclick="window.toggleChatApproval('${id}', false)"><i class="fas fa-lock"></i> Revoke</button>` : `<button class="btn-action" style="background:var(--info); color:white;" onclick="window.toggleChatApproval('${id}', true)"><i class="fas fa-unlock"></i> Authorize Chat</button>`;
+                            tbody.innerHTML += `<tr><td style="font-weight:900; font-family:monospace; color:white;">#${id.substring(1, 7).toUpperCase()}</td><td style="font-weight:800;">${t.agent_pin || 'N/A'}</td><td><span style="color:var(--warning); font-weight:800;">${t.uid}</span><br><span style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">${t.type}</span></td><td>${btnHtml}</td></tr>`;
                         }
                     });
                 }
                 if(!hasTickets) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">No active tickets requiring authorization.</td></tr>';
-                
                 document.getElementById('statPendingTickets').innerText = pendingCount;
                 document.getElementById('statChatReqs').innerText = chatReqsCount;
             });
@@ -565,48 +552,7 @@
                 }
             });
 
-            // 19-COLUMN LEDGER
-            document.getElementById('dataEntryForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const id = document.getElementById('c_id').value;
-                if(!id) return showToast("Select a UID First", "error");
-
-                const payload = {
-                    status: document.getElementById('c_status').value,
-                    y_reg: document.getElementById('c_yreg').value || 0,
-                    active_m: document.getElementById('c_activem').value || 0,
-                    y_active: document.getElementById('c_yactive').value || "-",
-                    y_daily: document.getElementById('c_ydaily').value || 0,
-                    d_depo: document.getElementById('c_ddepo').value || 0,
-                    d_with: document.getElementById('c_dwith').value || 0,
-                    d_prof: document.getElementById('c_dprof').value || 0,
-                    t_to: document.getElementById('c_tto').value || 0,
-                    o_depo: document.getElementById('c_odepo').value || 0,
-                    o_with: document.getElementById('c_owith').value || 0,
-                    o_prof: document.getElementById('c_oprof').value || 0,
-                    avg: document.getElementById('c_avg').value || 0,
-                    depo_1: document.getElementById('c_1st').value || 0,
-                    depo_2: document.getElementById('c_2nd').value || 0,
-                    depo_3: document.getElementById('c_3rd').value || 0,
-                    p_womb: document.getElementById('c_pwomb').value || 0,
-                    lot_per: document.getElementById('c_lot').value || 0,
-                    pinned: false 
-                };
-
-                await set(ref(db, 'agent_data/' + id), payload);
-                
-                // Update Registry
-                const uidRef = ref(db, `registered_uids/${id}`);
-                get(uidRef).then((snap) => {
-                    let currentLifetime = snap.exists() ? (snap.val().lifetime_profit || 0) : 0;
-                    update(uidRef, { data_status: "filled", lifetime_profit: currentLifetime + parseFloat(payload.d_prof) });
-                });
-
-                showToast("Ledger Synced to Core Database!");
-                e.target.reset();
-            });
-
-            // LIVE DB, DELETE & PIN
+            // LIVE DB
             onValue(ref(db, 'agent_data'), (snapshot) => {
                 const tbody = document.getElementById('realTimeTableBody');
                 tbody.innerHTML = '';
@@ -622,7 +568,7 @@
                             <tr>
                                 <td class="no-export" style="position: sticky; left: 0; background: #0a0a0a; z-index: 10; border-right: 1px solid var(--border);">
                                     <div style="display:flex; gap:8px;">
-                                        <button class="btn-pin ${d.pinned ? 'active' : ''}" onclick="window.togglePin('${id}', ${!d.pinned})" title="Pin to Top Leaderboard"><i class="fas fa-thumbtack"></i></button>
+                                        <button class="btn-pin ${d.pinned ? 'active' : ''}" onclick="window.togglePin('${id}', ${!d.pinned})" title="Pin to Top"><i class="fas fa-thumbtack"></i></button>
                                         <button class="btn-action btn-delete" onclick="window.deleteAgentData('${id}')"><i class="fas fa-trash"></i></button>
                                     </div>
                                 </td>
@@ -643,33 +589,130 @@
             });
         } // End initHeadData
 
-        // Global functions mapped to window
-        window.toggleBan = async function(id, newStatus) {
-            await update(ref(db, 'users/' + id), { status: newStatus });
-            showToast(`User ${id} ${newStatus === 'banned' ? 'Suspended!' : 'Restored!'}`);
-        };
-        window.deleteUser = async function(id) {
-            if(confirm(`⚠️ PERMANENTLY ERADICATE user ID: ${id}?`)) {
-                await remove(ref(db, 'users/' + id));
-                showToast(`User ${id} Eradicated!`, "error");
-            }
-        };
-        window.toggleChatApproval = async function(ticketId, status) {
-            await update(ref(db, 'tickets/' + ticketId), { chat_approved: status });
-            showToast(status ? "Chat Channel Authorized!" : "Chat Channel Locked");
-        };
-        window.togglePin = async function(id, status) {
-            await update(ref(db, 'agent_data/' + id), { pinned: status });
-            showToast(status ? `Agent ${id} Rigged to Top!` : `Agent ${id} Unpinned`);
-        }
-        window.deleteAgentData = async function(id) {
-            if(confirm(`⚠️ ERADICATE ledger for Agent: ${id}?`)) {
-                await remove(ref(db, 'agent_data/' + id));
-                showToast(`Agent ${id} Ledger Erased!`, "error");
-            }
+        // ================= BULK EXCEL UPLOAD LOGIC =================
+        
+        // 1. Download Template
+        window.downloadExcelTemplate = function() {
+            const headers = ["UID", "STATUS", "Y_REG", "ACTIVE_M", "Y_ACTIVE", "Y_DAILY_DEP", "DAILY_DEP", "DAILY_WITH", "DAILY_PROF", "TOTAL_TO", "O_DEPO", "O_WITH", "O_PROF", "AVG_RCHG", "DEPO_1", "DEPO_2", "DEPO_3", "PROF_WOMB", "LOTTERY_PER"];
+            const ws = XLSX.utils.aoa_to_sheet([headers]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Agent_Data");
+            XLSX.writeFile(wb, "Agent_Data_Template.xlsx");
+            showToast("Template Downloaded!");
         };
 
-        // SEARCH & EXPORT
+        // 2. Handle Upload & Sync
+        window.handleExcelUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showToast("Syncing data with Firebase...", "success");
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    // Convert Excel to JSON Array
+                    const excelData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if(excelData.length === 0) {
+                        showToast("File is empty!", "error");
+                        return;
+                    }
+
+                    // Loop through each row and push to Firebase
+                    for (let row of excelData) {
+                        if(!row.UID) continue; // Skip if UID is missing
+
+                        let uid = String(row.UID).trim();
+                        let payload = {
+                            status: row.STATUS || "POSITIVE",
+                            y_reg: row.Y_REG || 0,
+                            active_m: row.ACTIVE_M || 0,
+                            y_active: row.Y_ACTIVE || "-",
+                            y_daily: row.Y_DAILY_DEP || 0,
+                            d_depo: row.DAILY_DEP || 0,
+                            d_with: row.DAILY_WITH || 0,
+                            d_prof: row.DAILY_PROF || 0,
+                            t_to: row.TOTAL_TO || 0,
+                            o_depo: row.O_DEPO || 0,
+                            o_with: row.O_WITH || 0,
+                            o_prof: row.O_PROF || 0,
+                            avg: row.AVG_RCHG || 0,
+                            depo_1: row.DEPO_1 || 0,
+                            depo_2: row.DEPO_2 || 0,
+                            depo_3: row.DEPO_3 || 0,
+                            p_womb: row.PROF_WOMB || 0,
+                            lot_per: row.LOTTERY_PER || 0,
+                            pinned: false
+                        };
+
+                        // 1. Set 19 column data
+                        await set(ref(db, 'agent_data/' + uid), payload);
+                        
+                        // 2. Update Registry Lifetime profit
+                        const uidRef = ref(db, `registered_uids/${uid}`);
+                        let snap = await get(uidRef);
+                        let currentLifetime = snap.exists() ? (snap.val().lifetime_profit || 0) : 0;
+                        await update(uidRef, { data_status: "filled", lifetime_profit: currentLifetime + parseFloat(payload.d_prof) });
+                    }
+
+                    showToast(`Successfully synced ${excelData.length} Agents!`);
+                    document.getElementById('excelFileInput').value = ''; // Reset input
+                } catch(err) {
+                    showToast("Error processing Excel file.", "error");
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        // MANUAL SINGLE ENTRY
+        document.getElementById('dataEntryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('c_id').value;
+            if(!id) return showToast("Select a UID First", "error");
+            const payload = {
+                status: document.getElementById('c_status').value,
+                y_reg: document.getElementById('c_yreg').value || 0,
+                active_m: document.getElementById('c_activem').value || 0,
+                y_active: document.getElementById('c_yactive').value || "-",
+                y_daily: document.getElementById('c_ydaily').value || 0,
+                d_depo: document.getElementById('c_ddepo').value || 0,
+                d_with: document.getElementById('c_dwith').value || 0,
+                d_prof: document.getElementById('c_dprof').value || 0,
+                t_to: document.getElementById('c_tto').value || 0,
+                o_depo: document.getElementById('c_odepo').value || 0,
+                o_with: document.getElementById('c_owith').value || 0,
+                o_prof: document.getElementById('c_oprof').value || 0,
+                avg: document.getElementById('c_avg').value || 0,
+                depo_1: document.getElementById('c_1st').value || 0,
+                depo_2: document.getElementById('c_2nd').value || 0,
+                depo_3: document.getElementById('c_3rd').value || 0,
+                p_womb: document.getElementById('c_pwomb').value || 0,
+                lot_per: document.getElementById('c_lot').value || 0,
+                pinned: false 
+            };
+            await set(ref(db, 'agent_data/' + id), payload);
+            const uidRef = ref(db, `registered_uids/${id}`);
+            get(uidRef).then((snap) => {
+                let currentLifetime = snap.exists() ? (snap.val().lifetime_profit || 0) : 0;
+                update(uidRef, { data_status: "filled", lifetime_profit: currentLifetime + parseFloat(payload.d_prof) });
+            });
+            showToast("Ledger Synced to Core Database!");
+            e.target.reset();
+        });
+
+        // Global functions
+        window.toggleBan = async function(id, newStatus) { await update(ref(db, 'users/' + id), { status: newStatus }); showToast(`User ${newStatus === 'banned' ? 'Suspended' : 'Restored'}`); };
+        window.deleteUser = async function(id) { if(confirm(`Eradicate user ID: ${id}?`)) { await remove(ref(db, 'users/' + id)); showToast(`Eradicated!`, "error"); } };
+        window.toggleChatApproval = async function(ticketId, status) { await update(ref(db, 'tickets/' + ticketId), { chat_approved: status }); showToast(status ? "Chat Authorized!" : "Chat Locked"); };
+        window.togglePin = async function(id, status) { await update(ref(db, 'agent_data/' + id), { pinned: status }); showToast(status ? `Rigged to Top!` : `Unpinned`); }
+        window.deleteAgentData = async function(id) { if(confirm(`Erase ledger for Agent: ${id}?`)) { await remove(ref(db, 'agent_data/' + id)); showToast(`Erased!`, "error"); } };
+
         window.searchTable = function() {
             let input = document.getElementById("searchInput").value.toUpperCase();
             let rows = document.getElementById("realTimeTableBody").getElementsByTagName("tr");
@@ -694,10 +737,9 @@
             let downloadLink = document.createElement("a");
             downloadLink.download = filename; downloadLink.href = window.URL.createObjectURL(csvFile);
             downloadLink.style.display = "none"; document.body.appendChild(downloadLink); downloadLink.click();
-            showToast("Ledger Exported Successfully!");
+            showToast("Exported Successfully!");
         };
 
-        // SYSTEM WIPE
         window.triggerMonthlyReset = async function() {
             if(prompt("Type 'WIPE' to confirm full system wipe:") === 'WIPE') {
                 await remove(ref(db, 'agent_data'));
