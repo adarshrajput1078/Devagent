@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Head | VIP Control Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Master Head | Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- EXCEL SHEETJS LIBRARY -->
@@ -19,354 +19,398 @@
 
     <style>
         :root {
-            --bg-base: #000000; 
-            --bg-surface: #050505; 
-            --primary: #fbbf24; /* Royal Gold */
-            --primary-hover: #f59e0b; 
-            --primary-glow: rgba(251, 191, 36, 0.4);
-            --gold: #fbbf24; --gold-dark: #b45309;
-            --text-main: #ffffff; --text-muted: #9ca3af;
-            --danger: #ef4444; --success: #10b981; --info: #3b82f6; --purple: #8b5cf6;
-            --border: rgba(251, 191, 36, 0.25); 
+            --sidebar-bg: #2b323c;
+            --sidebar-hover: #1e2329;
+            --header-bg: #5b9bd5;
+            --bg-main: #f4f5f7;
+            --text-dark: #333333;
+            --text-muted: #888888;
+            --accent-yellow: #ffb822;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --card-bg: #ffffff;
+            --border-light: #e5e7eb;
         }
         
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-base); color: var(--text-main); overflow: hidden; perspective: 1000px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Open Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-main); color: var(--text-dark); overflow-x: hidden; display: flex; }
         .hidden { display: none !important; }
-        input, select, button { outline: none; border: none; font-family: inherit; }
+        input, select, button { outline: none; font-family: inherit; }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 10px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
 
-        #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); color: var(--primary); padding: 14px 28px; border-radius: 30px; font-weight: 800; font-size: 14px; border: 1px solid var(--primary); box-shadow: 0 10px 30px var(--primary-glow); z-index: 99999; transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 10px; }
-        #toast.show { top: 30px; }
+        /* Toast */
+        #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 99999; transition: 0.5s; display: flex; align-items: center; gap: 10px; }
+        #toast.show { top: 20px; }
 
         /* VIP LOADER */
-        #vipLoader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
-        .loader-ring { width: 90px; height: 90px; border: 4px solid rgba(251, 191, 36, 0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; box-shadow: 0 0 30px var(--primary-glow); }
-        .loader-text { font-size: 15px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 4px; animation: pulse 1.5s infinite; }
+        #vipLoader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
+        .loader-ring { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top-color: var(--header-bg); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        .loader-text { font-size: 14px; font-weight: 700; color: var(--header-bg); letter-spacing: 1px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes pulse { 50% { opacity: 0.5; } }
 
-        /* MAIN APP UI */
-        #mainApp { display: flex; flex-direction: column; height: 100vh; width: 100vw; background: radial-gradient(circle at top right, #111, #000); opacity: 0; transition: opacity 0.8s ease; }
+        /* SIDEBAR */
+        .sidebar { width: 260px; background: var(--sidebar-bg); height: 100vh; position: fixed; left: -260px; top: 0; z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+        .sidebar.active { left: 0; }
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: 0.3s; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
         
-        .flash-ticker { background: linear-gradient(90deg, #991b1b, #ef4444, #991b1b); color: white; padding: 8px 15px; font-size: 13px; font-weight: 900; display: flex; align-items: center; letter-spacing: 1px; text-transform: uppercase; z-index: 51; box-shadow: 0 2px 15px rgba(239, 68, 68, 0.5); }
-        .flash-ticker span { white-space: nowrap; animation: marquee 15s linear infinite; }
-        @keyframes marquee { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
-
-        .app-bar { height: 75px; background: rgba(5,5,5,0.9); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; border-bottom: 1px solid var(--border); z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
-        .app-bar .icon-btn { background: transparent; color: var(--primary); font-size: 26px; cursor: pointer; transition: 0.2s; }
-        .app-bar .brand { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;}
+        .sidebar-brand { height: 60px; background: #232931; display: flex; align-items: center; padding: 0 20px; color: white; font-size: 20px; font-weight: 700; gap: 12px; }
+        .sidebar-brand i { color: var(--accent-yellow); }
         
-        /* Drawer Sidebar */
-        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 60; opacity: 0; pointer-events: none; transition: 0.3s; }
-        .drawer-overlay.active { opacity: 1; pointer-events: all; }
-        .drawer { position: fixed; top: 0; left: -300px; width: 290px; height: 100vh; background: #050505; border-right: 1px solid var(--border); z-index: 65; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: 10px 0 40px rgba(0,0,0,0.9); }
-        .drawer.active { left: 0; }
-        .drawer-header { padding: 40px 25px 25px; border-bottom: 1px solid var(--border); background: radial-gradient(circle at bottom, rgba(251,191,36,0.15), transparent); text-align: center;}
-        .profile-pic { width: 75px; height: 75px; background: #111; border: 2px solid var(--primary); border-radius: 50%; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 35px; color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); animation: floatLogo 3s infinite ease-in-out; }
-        @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .user-info { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .user-icon { width: 60px; height: 60px; background: var(--header-bg); border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; color: white; font-size: 24px; margin-bottom: 10px; }
+        .user-info h4 { color: white; font-size: 15px; }
+        .user-info p { color: var(--accent-yellow); font-size: 12px; font-weight: 600; margin-top: 5px; }
+
+        .sidebar-nav { list-style: none; padding: 10px 0; overflow-y: auto; flex: 1; }
+        .sidebar-nav li { padding: 15px 20px; color: #a9b3c4; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 15px; cursor: pointer; border-left: 4px solid transparent; transition: 0.2s; }
+        .sidebar-nav li:hover { background: var(--sidebar-hover); color: white; }
+        .sidebar-nav li.active { background: var(--sidebar-hover); color: white; border-left-color: var(--accent-yellow); }
+        .sidebar-nav li i { width: 20px; text-align: center; font-size: 16px; }
+
+        /* MAIN WRAPPER */
+        .main-wrapper { flex: 1; min-height: 100vh; display: flex; flex-direction: column; width: 100%; transition: 0.3s; }
         
-        .drawer-nav { list-style: none; padding: 15px 0; flex: 1; overflow-y: auto; }
-        .drawer-nav li { padding: 16px 25px; font-size: 13px; font-weight: 800; color: var(--text-muted); display: flex; align-items: center; gap: 16px; cursor: pointer; border-left: 4px solid transparent; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;}
-        .drawer-nav li:hover { color: white; background: rgba(255,255,255,0.05); }
-        .drawer-nav li.active { color: var(--primary); background: rgba(251, 191, 36, 0.1); border-left-color: var(--primary); box-shadow: inset 20px 0 30px -20px var(--primary-glow); }
-        .drawer-nav li i { font-size: 20px; width: 24px; text-align: center; }
+        /* HEADER */
+        .header { background: var(--header-bg); height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .menu-toggle { background: transparent; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 15px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .logout-btn:hover { background: var(--accent-red); }
 
-        .app-content { flex: 1; overflow-y: auto; padding: 25px; padding-bottom: 80px; perspective: 1000px; }
+        /* CONTENT AREA */
+        .content { padding: 20px; flex: 1; overflow-y: auto; }
+        .page-title { font-size: 20px; font-weight: 700; color: var(--text-dark); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+        /* CARDS */
+        .card { background: var(--card-bg); border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border-light); }
+        .card-header { font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; }
         
-        /* Premium Cards */
-        .card { background: rgba(10, 10, 10, 0.9); border-radius: 20px; padding: 25px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: 0 15px 35px rgba(0,0,0,0.8); backdrop-filter: blur(15px); transition: transform 0.3s ease; }
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 25px rgba(251,191,36,0.1); }
-        .card-title { font-size: 18px; font-weight: 900; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 10px; color: white; text-transform: uppercase; justify-content: space-between;}
+        /* STATS GRID */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-box { display: flex; align-items: center; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border-light); gap: 15px; }
+        .stat-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 22px; flex-shrink: 0; }
+        .bg-green { background: var(--accent-green); } .bg-yellow { background: var(--accent-yellow); } .bg-blue { background: var(--accent-blue); } .bg-red { background: var(--accent-red); }
+        .stat-info { display: flex; flex-direction: column; }
+        .stat-val { font-size: 22px; font-weight: 700; color: var(--text-dark); }
+        .stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 2px; }
+
+        /* FORMS */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        @media(max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
+        .form-control { width: 100%; padding: 12px 15px; background: white; border: 1px solid #d1d5db; border-radius: 6px; color: var(--text-dark); font-size: 14px; transition: 0.2s; }
+        .form-control:focus { border-color: var(--header-bg); box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.1); }
         
-        /* Stats */
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .stat-box { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.05); padding: 25px 15px; border-radius: 16px; text-align: center; position: relative; overflow: hidden; transition: 0.3s; }
-        .stat-box::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:var(--primary); opacity: 0.5; transition: 0.3s; }
-        .stat-box:hover::before { opacity: 1; background: var(--primary); }
-        .stat-box p { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin-bottom: 8px; letter-spacing: 1px;}
-        .stat-box h3 { font-size: 32px; color: white; font-weight: 900; font-family: monospace; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .btn { padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--header-bg); color: white; } .btn-primary:hover { background: #4a8ac2; }
+        .btn-warning { background: var(--accent-yellow); color: white; }
+        .btn-success { background: var(--accent-green); color: white; }
+        .btn-outline { background: white; border: 1px solid #d1d5db; color: var(--text-dark); } .btn-outline:hover { background: #f9fafb; border-color: #9ca3af; }
 
-        /* Forms */
-        .form-section-title { font-size: 14px; color: var(--primary); font-weight: 900; text-transform: uppercase; margin: 25px 0 15px; letter-spacing: 1.5px; border-left: 3px solid var(--primary); padding-left: 10px;}
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        @media(max-width: 380px) { .form-grid { grid-template-columns: 1fr; } }
+        /* TABLES */
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 6px; border: 1px solid var(--border-light); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; background: white; }
+        th { background: #f8f9fa; color: #4b5563; font-weight: 700; font-size: 12px; text-transform: uppercase; padding: 12px 15px; text-align: left; border-bottom: 2px solid #e5e7eb; position: sticky; top: 0; white-space: nowrap; }
+        td { padding: 12px 15px; font-size: 13px; color: #374151; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+        tr:hover { background: #f9fafb; }
         
-        .input-group { margin-bottom: 18px; }
-        .input-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;}
-        .input-group input, .input-group select { width: 100%; padding: 16px; background: #000; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; color: white; font-size: 15px; font-weight: 700; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.8); }
-        .input-group input:focus, .input-group select:focus { border-color: var(--primary); background: rgba(251,191,36,0.05); box-shadow: inset 0 2px 5px rgba(0,0,0,0.8), 0 0 15px var(--primary-glow); }
-        
-        .btn-app { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: #000; border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: 0 10px 25px var(--primary-glow); text-transform: uppercase; letter-spacing: 1.5px; }
-        .btn-app:active { transform: translateY(2px); box-shadow: 0 5px 10px var(--primary-glow); }
+        .badge { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid var(--accent-red); }
 
-        /* Excel Upload Specific */
-        .excel-upload-box { background: rgba(251, 191, 36, 0.05); border: 1px dashed var(--gold); border-radius: 16px; padding: 30px; text-align: center; margin-bottom: 30px; transition: 0.3s; }
-        .excel-upload-box:hover { background: rgba(251, 191, 36, 0.1); border-style: solid; box-shadow: 0 0 20px rgba(251,191,36,0.2); }
-        .excel-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 14px 24px; border-radius: 12px; font-weight: 900; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-outline:hover { background: var(--gold); color: #000; box-shadow: 0 5px 15px var(--gold-glow); }
+        .action-icon { width: 30px; height: 30px; border-radius: 4px; border: none; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; color: white; font-size: 12px; margin-right: 5px; }
 
-        /* Data Tables & Controls */
-        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .search-bar { background: #000; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 12px 15px; color: white; width: 100%; max-width: 300px; font-size: 14px; font-weight: 600; }
-        .search-bar:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-        
-        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.8); }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 16px 18px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; font-weight: 600; white-space: nowrap; }
-        th { background: #000; color: var(--primary); font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--primary); }
-        tbody tr:hover { background: rgba(251,191,36,0.05); }
+        /* EXCEL IMPORT AREA */
+        .upload-area { border: 2px dashed #d1d5db; border-radius: 8px; padding: 40px 20px; text-align: center; background: #f9fafb; margin-bottom: 20px; transition: 0.3s; }
+        .upload-area:hover { border-color: var(--header-bg); background: rgba(91, 155, 213, 0.05); }
+        .upload-area i { font-size: 40px; color: var(--header-bg); margin-bottom: 10px; }
+        .upload-area h4 { font-size: 16px; color: var(--text-dark); margin-bottom: 5px; }
 
-        /* Action Buttons */
-        .btn-action { padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 900; cursor: pointer; transition: 0.2s; border: none; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; }
-        .btn-export { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
-        .btn-print { background: rgba(59, 130, 246, 0.15); color: var(--info); border: 1px solid var(--info); }
-        .btn-ban { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-unban { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
-        .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .btn-pin { background: transparent; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.2); padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .btn-pin.active { background: rgba(251, 191, 36, 0.2); color: var(--primary); border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+        @media(min-width: 1024px) {
+            .sidebar { left: 0; }
+            .sidebar-overlay { display: none !important; }
+            .main-wrapper { margin-left: 260px; width: calc(100% - 260px); }
+            .menu-toggle { display: none; }
+        }
 
-        .badge { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 900; letter-spacing: 1px; }
-        .badge-positive { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
-        .badge-negative { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
-
-        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px) rotateX(-5deg); } to { opacity: 1; transform: translateY(0) rotateX(0); } }
-        .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; }
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- SECURE LOADING SCREEN -->
+    <!-- LOADER -->
     <div id="vipLoader">
         <div class="loader-ring"></div>
-        <div class="loader-text">Authorizing Master Identity...</div>
+        <div class="loader-text">Loading Admin Panel...</div>
     </div>
 
     <div id="toast"><i id="toastIcon"></i> <span id="toastMsg"></span></div>
 
-    <!-- MAIN APP UI -->
-    <div id="mainApp">
-        <div class="flash-ticker">
-            <i class="fas fa-bullhorn" style="margin-right: 10px;"></i>
-            <span id="flashMessageDisplay">WELCOME TO THE MASTER CONTROL NODE. ALL SYSTEMS NOMINAL.</span>
+    <!-- SIDEBAR -->
+    <div class="sidebar-overlay" id="drawerOverlay"></div>
+    <div class="sidebar" id="sideDrawer">
+        <div class="sidebar-brand">
+            <i class="fas fa-layer-group"></i> <span>Occaecat Admin</span>
         </div>
+        <div class="user-info">
+            <div class="user-icon"><i class="fas fa-user"></i></div>
+            <h4>Head Administrator</h4>
+            <p>Master Control</p>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="nav-item active" data-target="tab-dashboard"><i class="fas fa-home"></i> Dashboard</li>
+            <li class="nav-item" data-target="tab-broadcast"><i class="fas fa-bullhorn"></i> Target & Alerts</li>
+            <li class="nav-item" data-target="tab-create"><i class="fas fa-users-cog"></i> Users & Roles</li>
+            <li class="nav-item" data-target="tab-chat-approvals"><i class="fas fa-comments"></i> Support Chats</li>
+            <li class="nav-item" data-target="tab-uids"><i class="fas fa-address-book"></i> Agent Whitelist</li>
+            <li class="nav-item" data-target="tab-dataentry"><i class="fas fa-file-excel"></i> Data Import</li>
+            <li class="nav-item" data-target="tab-livedata"><i class="fas fa-table"></i> Live Database</li>
+            <li class="nav-item" data-target="tab-settings" style="color:#ef4444;"><i class="fas fa-trash-alt"></i> System Reset</li>
+        </ul>
+    </div>
 
-        <header class="app-bar">
-            <button class="icon-btn" id="menuBtn"><i class="fas fa-bars-staggered"></i></button>
-            <div class="brand"><img src="Logo.png" alt="" style="height: 28px;" onerror="this.style.display='none'"> GOD MODE</div>
-            <button class="icon-btn" id="logoutBtn" style="color: var(--danger);"><i class="fas fa-power-off"></i></button>
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper" id="mainApp">
+        <!-- HEADER -->
+        <header class="header">
+            <button class="menu-toggle" id="menuBtn"><i class="fas fa-bars"></i></button>
+            <div style="font-size: 14px; font-weight: 600; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-bell" style="color:var(--accent-yellow);"></i> <span id="flashMessageDisplay">All systems nominal.</span>
+            </div>
+            <div class="header-right">
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-power-off"></i> Logout</button>
+            </div>
         </header>
 
-        <div class="drawer-overlay" id="drawerOverlay"></div>
-        <nav class="drawer" id="sideDrawer">
-            <div class="drawer-header">
-                <div class="profile-pic"><i class="fas fa-chess-king"></i></div>
-                <h3 style="font-size: 20px; font-weight: 900; color: white; text-transform: uppercase;">Head Admin</h3>
-                <p style="font-size: 12px; color: var(--primary); font-weight: 800; margin-top: 8px; letter-spacing:1px;"><i class="fas fa-globe"></i> Global Access Level</p>
-            </div>
-            <ul class="drawer-nav">
-                <li class="nav-item active" data-target="tab-dashboard"><i class="fas fa-chart-line"></i> Intelligence Hub</li>
-                <li class="nav-item" data-target="tab-broadcast"><i class="fas fa-bullhorn"></i> Target & Broadcast</li>
-                <li class="nav-item" data-target="tab-create"><i class="fas fa-user-shield"></i> Network Access</li>
-                <li class="nav-item" data-target="tab-chat-approvals"><i class="fas fa-comments"></i> Chat Approvals</li>
-                <li class="nav-item" data-target="tab-uids"><i class="fas fa-id-card"></i> UID Registry</li>
-                <li class="nav-item" data-target="tab-dataentry"><i class="fas fa-pen-nib"></i> Ledger & Excel Sync</li>
-                <li class="nav-item" data-target="tab-livedata"><i class="fas fa-database"></i> Live Database</li>
-                <li class="nav-item" data-target="tab-settings" style="color:var(--danger); border-top:1px solid rgba(255,255,255,0.05); margin-top:10px;"><i class="fas fa-skull"></i> System Wipe</li>
-            </ul>
-        </nav>
-
-        <main class="app-content">
+        <!-- CONTENT -->
+        <div class="content">
             
-            <!-- 1. Dashboard -->
+            <!-- 1. DASHBOARD -->
             <div id="tab-dashboard" class="app-tab fade-in">
-                <div class="card">
-                    <div class="card-title"><i class="fas fa-bolt" style="color: var(--primary);"></i> Network Pulse</div>
-                    <div class="stat-grid">
-                        <div class="stat-box"><p>Total Records</p><h3 id="statTotalAgents">0</h3></div>
-                        <div class="stat-box"><p>Global Daily Profit</p><h3 id="statGlobalPL" style="color: var(--success);">₹ 0</h3></div>
-                        <div class="stat-box"><p>Pending Support</p><h3 id="statPendingTickets" style="color: var(--warning);">0</h3></div>
-                        <div class="stat-box"><p>Chat Requests</p><h3 id="statChatReqs" style="color: var(--info);">0</h3></div>
+                <h2 class="page-title"><i class="fas fa-home"></i> System Overview</h2>
+                
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-icon bg-green"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-val" id="statTotalAgents">0</span>
+                            <span class="stat-label">Total Records</span>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon bg-yellow"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-val" id="statGlobalPL">₹ 0</span>
+                            <span class="stat-label">Global Daily Profit</span>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon bg-blue"><i class="fas fa-ticket-alt"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-val" id="statPendingTickets">0</span>
+                            <span class="stat-label">Pending Tickets</span>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon bg-red"><i class="fas fa-comments"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-val" id="statChatReqs">0</span>
+                            <span class="stat-label">Chat Requests</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. Targets & Broadcast -->
+            <!-- 2. TARGET & BROADCAST -->
             <div id="tab-broadcast" class="app-tab hidden">
+                <h2 class="page-title"><i class="fas fa-bullhorn"></i> Target & Alerts</h2>
+                
                 <div class="card fade-in">
-                    <div class="card-title"><i class="fas fa-bullhorn" style="color: var(--danger);"></i> Live Flash Broadcast</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Set the scrolling marquee text visible to all users.</p>
-                    <form id="broadcastForm" style="display: flex; gap: 10px;">
-                        <input type="text" id="b_msg" placeholder="e.g. SYSTEM MAINTENANCE AT 12 PM..." required style="width: 100%; padding: 18px; border-radius: 12px; background: #000; color: white; border: 1px solid rgba(255,255,255,0.2); font-weight:800; text-transform:uppercase;">
-                        <button type="submit" class="btn-app" style="width: auto; padding: 18px 25px;"><i class="fas fa-paper-plane"></i></button>
+                    <div class="card-header">Live Flash Broadcast</div>
+                    <form id="broadcastForm">
+                        <div class="form-group">
+                            <label>Scrolling Marquee Message</label>
+                            <input type="text" id="b_msg" class="form-control" placeholder="Enter alert text..." required>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Broadcast Message</button>
                     </form>
                 </div>
 
-                <div class="card fade-in delay-1">
-                    <div class="card-title"><i class="fas fa-gem" style="color: var(--info);"></i> Monthly Target Setup</div>
-                    <form id="targetForm" style="display: flex; gap: 10px;">
-                        <input type="number" id="targetAmount" placeholder="Target Profit (e.g. 50000)" required style="width: 60%; padding: 18px; border-radius: 12px; background: #000; color: white; border: 1px solid rgba(255,255,255,0.2);">
-                        <input type="text" id="targetReward" placeholder="Reward (e.g. ₹5000)" required style="width: 40%; padding: 18px; border-radius: 12px; background: #000; color: white; border: 1px solid rgba(255,255,255,0.2);">
-                        <button type="submit" class="btn-app" style="width: auto; padding: 18px 25px;"><i class="fas fa-save"></i></button>
+                <div class="card fade-in">
+                    <div class="card-header">Monthly Target Setup</div>
+                    <form id="targetForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Target Profit Amount (₹)</label>
+                                <input type="number" id="targetAmount" class="form-control" placeholder="50000" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Reward Bonus</label>
+                                <input type="text" id="targetReward" class="form-control" placeholder="₹5000 Bonus" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Target</button>
                     </form>
                 </div>
             </div>
 
-            <!-- 3. Access Control -->
+            <!-- 3. ACCESS CONTROL -->
             <div id="tab-create" class="app-tab hidden">
+                <h2 class="page-title"><i class="fas fa-users-cog"></i> Users & Roles</h2>
+                
                 <div class="card fade-in">
-                    <div class="card-title"><i class="fas fa-key"></i> Generate Access Identity</div>
+                    <div class="card-header">Create New Node</div>
                     <form id="createUserForm">
-                        <div class="form-grid">
-                            <div class="input-group">
-                                <label>Secure Login PIN (ID)</label>
-                                <input type="tel" id="newUserId" placeholder="e.g., 9999" required autocomplete="off">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Login PIN / ID</label>
+                                <input type="tel" id="newUserId" class="form-control" placeholder="e.g., 1001" required>
                             </div>
-                            <div class="input-group">
-                                <label>Authorization Role</label>
-                                <select id="newUserRole">
-                                    <option value="agent">Agent (Worker Panel)</option>
-                                    <option value="teacher">Teacher (Manager Panel)</option>
+                            <div class="form-group">
+                                <label>Account Role</label>
+                                <select id="newUserRole" class="form-control">
+                                    <option value="agent">Agent (Worker)</option>
+                                    <option value="teacher">Teacher (Manager)</option>
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="btn-app"><i class="fas fa-user-plus" style="margin-right: 8px;"></i> Authorize Identity</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Create Account</button>
                     </form>
                 </div>
 
-                <div class="card fade-in delay-1" style="padding: 20px 0;">
-                    <div class="card-title" style="padding: 0 25px 15px;"><i class="fas fa-gavel" style="color: var(--danger);"></i> Network Roster Management</div>
-                    <div class="table-wrap">
+                <div class="card fade-in">
+                    <div class="card-header">User Management Directory</div>
+                    <div class="table-responsive">
                         <table>
                             <thead><tr><th>USER ID</th><th>ROLE</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
-                            <tbody id="banManagementTable"><tr><td colspan="4" style="text-align:center;">Fetching...</td></tr></tbody>
+                            <tbody id="banManagementTable"><tr><td colspan="4" align="center">Fetching...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- 4. Chat Approvals -->
+            <!-- 4. CHAT APPROVALS -->
             <div id="tab-chat-approvals" class="app-tab hidden">
-                <div class="card fade-in" style="padding: 20px 0;">
-                    <div class="card-title" style="padding: 0 25px 15px;"><i class="fas fa-comments" style="color: var(--info);"></i> Chat Authorizations</div>
-                    <div class="table-wrap">
+                <h2 class="page-title"><i class="fas fa-comments"></i> Support Chat Control</h2>
+                <div class="card fade-in">
+                    <div class="card-header">Pending Authorizations</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Approve or revoke Teacher-to-Agent direct messaging.</p>
+                    <div class="table-responsive">
                         <table>
-                            <thead><tr><th>TICKET ID</th><th>AGENT</th><th>UID / ISSUE</th><th>CHAT CONTROL</th></tr></thead>
+                            <thead><tr><th>TICKET ID</th><th>AGENT</th><th>ISSUE</th><th>ACTION</th></tr></thead>
                             <tbody id="chatApprovalTable">
-                                <tr><td colspan="4" style="text-align:center; padding: 20px;">No pending tickets found.</td></tr>
+                                <tr><td colspan="4" align="center">No active requests.</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- 5. UID Registry -->
+            <!-- 5. UID REGISTRY -->
             <div id="tab-uids" class="app-tab hidden">
+                <h2 class="page-title"><i class="fas fa-address-book"></i> Team Whitelist</h2>
                 <div class="card fade-in">
-                    <div class="card-title"><i class="fas fa-id-card"></i> Register Agent UIDs</div>
-                    <form id="addUidForm" style="display: flex; gap: 10px; margin-bottom: 25px;">
-                        <input type="text" id="newAgentUid" placeholder="Enter New Agent UID" required style="width: 100%; padding: 18px; border-radius: 12px; background: #000; color: white; border: 1px solid rgba(255,255,255,0.2); font-weight:800;">
-                        <button type="submit" class="btn-app" style="width: auto; padding: 18px 30px;"><i class="fas fa-plus"></i></button>
+                    <div class="card-header">Add Agent to Team</div>
+                    <form id="addUidForm">
+                        <div class="form-group">
+                            <label>Agent UID</label>
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" id="newAgentUid" class="form-control" placeholder="Enter Exact Member ID" required>
+                                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Add</button>
+                            </div>
+                        </div>
                     </form>
-                    <div class="table-wrap">
+                </div>
+                <div class="card fade-in">
+                    <div class="card-header">Registered Agents List</div>
+                    <div class="table-responsive">
                         <table>
-                            <thead><tr><th>AGENT UID</th><th>MONTH STATUS</th><th>LIFETIME PROFIT</th></tr></thead>
+                            <thead><tr><th>AGENT UID</th><th>STATUS</th><th>LIFETIME PROFIT</th></tr></thead>
                             <tbody id="uidTableBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- 6. Full 19-Column Input & Bulk Excel Upload -->
+            <!-- 6. SMART EXCEL IMPORT -->
             <div id="tab-dataentry" class="app-tab hidden">
+                <h2 class="page-title"><i class="fas fa-file-excel"></i> Data Synchronization</h2>
                 
-                <!-- NEW: EXCEL BULK UPLOAD SECTION -->
-                <div class="card fade-in excel-upload-box">
-                    <i class="fas fa-file-excel" style="font-size: 50px; color: var(--gold); margin-bottom: 15px;"></i>
-                    <h3 style="font-size: 20px; font-weight: 900; color: white; text-transform: uppercase; margin-bottom: 5px;">Bulk Data Sync (Excel / CSV)</h3>
-                    <p style="font-size: 13px; color: var(--text-muted); font-weight: 600; line-height: 1.5;">Update 100+ agents instantly. Download the template, fill the exact columns, and upload it back to sync with the Firebase Database automatically.</p>
+                <div class="upload-area fade-in">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h4>Smart Excel Auto-Filter</h4>
+                    <p>Upload the Head Manager's Excel file. The system will automatically scan, clean, and extract ONLY the agents present in your Whitelist.</p>
                     
-                    <div class="excel-actions">
-                        <button class="btn-outline" onclick="window.downloadExcelTemplate()"><i class="fas fa-download"></i> Get Template</button>
-                        
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-outline" onclick="window.downloadExcelTemplate()"><i class="fas fa-download"></i> Get Template</button>
                         <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display: none;" onchange="window.handleExcelUpload(event)">
-                        <button class="btn-app" style="width: auto; padding: 14px 24px;" onclick="document.getElementById('excelFileInput').click()"><i class="fas fa-upload"></i> Upload & Sync Data</button>
+                        <button class="btn btn-primary" onclick="document.getElementById('excelFileInput').click()"><i class="fas fa-file-import"></i> Select & Upload File</button>
                     </div>
                 </div>
 
-                <!-- OR MANUAL ENTRY -->
-                <div class="card fade-in delay-1">
-                    <div class="card-title" style="color:var(--text-muted); font-size:14px;"><i class="fas fa-keyboard"></i> Or Manual Single Entry</div>
+                <div class="card fade-in">
+                    <div class="card-header">Manual Single Entry Fallback</div>
                     <form id="dataEntryForm">
-                        <div class="input-group">
-                            <label>1. SELECT AGENT UID (Auto-syncs from registry)</label>
-                            <select id="c_id" required style="font-weight:900; color:var(--primary);"><option value="">-- Loading --</option></select>
+                        <div class="form-group">
+                            <label>1. Select Agent UID</label>
+                            <select id="c_id" class="form-control" required><option value="">-- Loading --</option></select>
                         </div>
                         
-                        <div class="form-section-title">Identity & Status</div>
-                        <div class="form-grid">
-                            <div class="input-group"><label>2. DATA STATUS</label><select id="c_status"><option value="POSITIVE">POSITIVE</option><option value="NEGATIVE">NEGATIVE</option></select></div>
-                            <div class="input-group"><label>3. Y-REGISTERED</label><input type="number" id="c_yreg" placeholder="0"></div>
-                            <div class="input-group"><label>4. ACTIVE MEMBER</label><input type="number" id="c_activem" placeholder="0"></div>
-                            <div class="input-group"><label>5. Y-ACTIVE</label><input type="text" id="c_yactive" placeholder="e.g. NO INVITE"></div>
+                        <h4 style="font-size:14px; margin: 20px 0 10px; color:var(--header-bg);">Status & Daily Details</h4>
+                        <div class="form-row">
+                            <div class="form-group"><label>DATA STATUS</label><input type="text" id="c_status" class="form-control" placeholder="e.g. POSITIVE"></div>
+                            <div class="form-group"><label>Y-REGISTERED</label><input type="number" id="c_yreg" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>ACTIVE MEMBER</label><input type="number" id="c_activem" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>Y-ACTIVE</label><input type="text" id="c_yactive" class="form-control" placeholder="-"></div>
+                            <div class="form-group"><label>Y-DAILY DEPOSIT</label><input type="number" id="c_ydaily" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>DAILY DEPOSIT</label><input type="number" id="c_ddepo" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>DAILY WITHDRAW</label><input type="number" id="c_dwith" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>DAILY PROFITS</label><input type="number" id="c_dprof" class="form-control" placeholder="0" required></div>
                         </div>
 
-                        <div class="form-section-title">Daily Operations</div>
-                        <div class="form-grid">
-                            <div class="input-group"><label>6. Y-DAILY DEPOSIT</label><input type="number" id="c_ydaily" placeholder="0.00" step="any"></div>
-                            <div class="input-group"><label>7. DAILY DEPOSIT</label><input type="number" id="c_ddepo" placeholder="0.00" step="any"></div>
-                            <div class="input-group"><label>8. DAILY WITHDRAWAL</label><input type="number" id="c_dwith" placeholder="0.00" step="any"></div>
-                            <div class="input-group"><label>9. DAILY PROFITS</label><input type="number" id="c_dprof" placeholder="0.00" step="any" required></div>
+                        <h4 style="font-size:14px; margin: 20px 0 10px; color:var(--header-bg);">Lifetime & Performance</h4>
+                        <div class="form-row">
+                            <div class="form-group"><label>TOTAL T.O</label><input type="number" id="c_tto" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>OVERALL DEPOSIT</label><input type="number" id="c_odepo" class="form-control" placeholder="0" required></div>
+                            <div class="form-group"><label>OVERALL WITHDRAW</label><input type="number" id="c_owith" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>OVERALL PROFITS</label><input type="number" id="c_oprof" class="form-control" placeholder="0" required></div>
+                            <div class="form-group"><label>AVG RECHARGE</label><input type="number" id="c_avg" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>1ST DEPO</label><input type="number" id="c_1st" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>2ND DEPO</label><input type="number" id="c_2nd" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>3RD DEPO</label><input type="number" id="c_3rd" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>PROFITS w/o MB</label><input type="number" id="c_pwomb" class="form-control" placeholder="0"></div>
+                            <div class="form-group"><label>LOTTERY T.O %</label><input type="number" id="c_lot" class="form-control" placeholder="0"></div>
                         </div>
-
-                        <div class="form-section-title">Lifetime Financials</div>
-                        <div class="form-grid">
-                            <div class="input-group"><label>10. TOTAL T.O</label><input type="number" id="c_tto" placeholder="0"></div>
-                            <div class="input-group"><label>11. OVERALL DEPOSIT</label><input type="number" id="c_odepo" placeholder="0.00" step="any" required></div>
-                            <div class="input-group"><label>12. OVERALL WITHDRAW</label><input type="number" id="c_owith" placeholder="0.00" step="any"></div>
-                            <div class="input-group"><label>13. OVERALL PROFITS</label><input type="number" id="c_oprof" placeholder="0.00" step="any" required></div>
-                            <div class="input-group"><label>14. AVG RECHARGE</label><input type="number" id="c_avg" placeholder="0.00" step="any"></div>
-                        </div>
-
-                        <div class="form-section-title">Performance Metrics</div>
-                        <div class="form-grid">
-                            <div class="input-group"><label>15. 1ST DEPO</label><input type="number" id="c_1st" placeholder="0"></div>
-                            <div class="input-group"><label>16. 2ND DEPO</label><input type="number" id="c_2nd" placeholder="0"></div>
-                            <div class="input-group"><label>17. 3RD DEPO</label><input type="number" id="c_3rd" placeholder="0"></div>
-                            <div class="input-group"><label>18. PROFITS w/o MB</label><input type="number" id="c_pwomb" placeholder="0.00" step="any"></div>
-                            <div class="input-group"><label>19. LOTTERY T.O %</label><input type="number" id="c_lot" placeholder="0.0" step="any"></div>
-                        </div>
-
-                        <button type="submit" class="btn-app" style="margin-top: 25px;"><i class="fas fa-upload"></i> Sync Ledger to Database</button>
+                        <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Save Manual Entry</button>
                     </form>
                 </div>
             </div>
 
-            <!-- 7. Global Live Database -->
+            <!-- 7. LIVE DATABASE -->
             <div id="tab-livedata" class="app-tab hidden">
-                <div class="card fade-in" style="padding: 20px;">
-                    <div class="card-title" style="border: none; margin-bottom: 5px;"><i class="fas fa-satellite-dish"></i> Global Live Feed</div>
-                    
-                    <div class="table-controls">
-                        <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search Agent UID..." onkeyup="window.searchTable()">
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn-action btn-export" onclick="window.exportToCSV('V-Admin_Master_Report.csv')"><i class="fas fa-file-excel"></i> Export CSV</button>
-                            <button class="btn-action btn-print" onclick="window.print()"><i class="fas fa-print"></i> PDF / Print</button>
+                <h2 class="page-title"><i class="fas fa-table"></i> Live Global Database</h2>
+                <div class="card fade-in" style="padding: 15px;">
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
+                        <input type="text" id="searchInput" class="form-control" style="max-width: 300px;" placeholder="Search UID..." onkeyup="window.searchTable()">
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-outline" onclick="window.exportToCSV('Admin_Report.csv')"><i class="fas fa-file-csv"></i> CSV</button>
+                            <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
                         </div>
                     </div>
 
-                    <div class="table-wrap" style="min-width: 100%;">
-                        <table id="dataTable" style="min-width: 2000px;">
+                    <div class="table-responsive">
+                        <table id="dataTable">
                             <thead>
                                 <tr>
-                                    <th class="no-export" style="background:#000; z-index:12;">ACTIONS</th>
-                                    <th style="background:#000; z-index:11;">UID</th>
+                                    <th class="no-export">ACTIONS</th>
+                                    <th>UID</th>
                                     <th>STATUS</th><th>Y-REG</th><th>ACTIVE M</th><th>Y-ACTIVE</th>
                                     <th>Y-DAILY DEP</th><th>DAILY DEP</th><th>DAILY WITH</th><th>DAILY PROF</th>
                                     <th>TOTAL T.O</th><th>O-DEPOSIT</th><th>O-WITHDRAW</th><th>O-PROFIT</th><th>AVG RCHG</th>
@@ -374,23 +418,24 @@
                                 </tr>
                             </thead>
                             <tbody id="realTimeTableBody">
-                                <tr><td colspan="20" style="text-align:center; padding: 40px;">Fetching Deep Database...</td></tr>
+                                <tr><td colspan="20" align="center">Fetching Database...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- 8. Monthly System Wipe -->
+            <!-- 8. SETTINGS / RESET -->
             <div id="tab-settings" class="app-tab hidden">
-                <div class="card fade-in" style="border-color: var(--danger); background: rgba(239, 68, 68, 0.05);">
-                    <div class="card-title" style="color: var(--danger);"><i class="fas fa-skull"></i> Execute Monthly Wipe</div>
-                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 25px; font-weight:700; line-height:1.6;">WARNING: This action clears all 19-column daily data for every agent and resets UID tracking to 'Pending' for the new month. Lifetime profits remain safe in the Registry.</p>
-                    <button class="btn-app" style="background: linear-gradient(135deg, #ef4444, #991b1b); box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); color:white;" onclick="window.triggerMonthlyReset()"><i class="fas fa-exclamation-triangle"></i> INITIATE SYSTEM WIPE</button>
+                <h2 class="page-title"><i class="fas fa-cogs"></i> System Settings</h2>
+                <div class="card fade-in" style="border: 1px solid var(--accent-red);">
+                    <div class="card-header" style="color: var(--accent-red);">Danger Zone: Monthly Wipe</div>
+                    <p style="font-size: 14px; color: #555; margin-bottom: 20px;">Executing this action will delete all 19-column data for the current month and reset tracking to "Pending". Lifetime profits in the Registry remain safe.</p>
+                    <button class="btn btn-primary" style="background: var(--accent-red);" onclick="window.triggerMonthlyReset()"><i class="fas fa-trash-alt"></i> Execute Master Reset</button>
                 </div>
             </div>
 
-        </main>
+        </div>
     </div>
 
     <!-- Firebase SDK & Logic -->
@@ -415,20 +460,15 @@
         window.showToast = function(msg, type="success") {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
-            toast.style.borderColor = type === 'error' ? 'var(--danger)' : 'var(--primary)';
-            toast.style.color = type === 'error' ? 'white' : 'var(--bg-base)';
-            toast.style.background = type === 'error' ? 'rgba(239,68,68,0.95)' : 'var(--primary)';
-            toast.style.boxShadow = type === 'error' ? '0 10px 30px rgba(239, 68, 68, 0.5)' : '0 10px 30px var(--primary-glow)';
+            toast.style.background = type === 'error' ? '#ef4444' : '#333';
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Verify Firebase Session
         if(sessionPin) {
             get(ref(db, 'users/' + sessionPin)).then((snapshot) => {
                 if(snapshot.exists() && snapshot.val().role === 'head') {
-                    loader.style.opacity = '0';
-                    setTimeout(() => { loader.style.display = 'none'; mainApp.style.opacity = '1'; }, 500);
+                    setTimeout(() => { loader.style.display = 'none'; }, 500);
                     initHeadData(); 
                 } else {
                     localStorage.removeItem('activeSessionPin');
@@ -442,6 +482,7 @@
             window.location.replace(BASE_URL + 'index.html');
         });
 
+        // Sidebar logic
         const toggleMenu = () => {
             document.getElementById('sideDrawer').classList.toggle('active');
             document.getElementById('drawerOverlay').classList.toggle('active');
@@ -457,7 +498,7 @@
                 const target = document.getElementById(e.currentTarget.dataset.target);
                 target.classList.remove('hidden');
                 void target.offsetWidth; target.classList.add('fade-in');
-                toggleMenu();
+                if(window.innerWidth < 1024) toggleMenu();
             });
         });
 
@@ -466,7 +507,7 @@
             document.getElementById('broadcastForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 await set(ref(db, 'system_config/marquee'), document.getElementById('b_msg').value);
-                showToast("Global Broadcast Updated!");
+                showToast("Broadcast Updated!");
                 e.target.reset();
             });
             onValue(ref(db, 'system_config/marquee'), (snapshot) => {
@@ -477,7 +518,7 @@
             document.getElementById('targetForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 await set(ref(db, 'system_targets'), { amount: document.getElementById('targetAmount').value, reward: document.getElementById('targetReward').value });
-                showToast("Monthly Target Deployed!");
+                showToast("Target Deployed!");
                 e.target.reset();
             });
 
@@ -487,7 +528,7 @@
                 const id = document.getElementById('newUserId').value.trim();
                 const role = document.getElementById('newUserRole').value;
                 await set(ref(db, 'users/' + id), { role: role, status: "active" });
-                showToast(`${role.toUpperCase()} Node Generated!`);
+                showToast(`${role.toUpperCase()} Generated!`);
                 e.target.reset();
             });
 
@@ -498,10 +539,10 @@
                     snapshot.forEach((child) => {
                         const id = child.key, d = child.val();
                         if(d.role !== 'head') {
-                            const btnClass = d.status === 'active' ? 'btn-ban' : 'btn-unban';
-                            const btnText = d.status === 'active' ? '<i class="fas fa-ban"></i> Ban' : '<i class="fas fa-check"></i> Unban';
+                            const btnClass = d.status === 'active' ? 'bg-red' : 'bg-blue';
+                            const btnIcon = d.status === 'active' ? 'fa-ban' : 'fa-check';
                             const newStatus = d.status === 'active' ? 'banned' : 'active';
-                            tbody.innerHTML += `<tr><td style="font-weight:900; color:white; font-size:16px; font-family:monospace;">${id}</td><td style="text-transform:uppercase; font-weight:800; color:var(--info);">${d.role}</td><td><span class="badge ${d.status === 'active' ? 'badge-positive' : 'badge-negative'}">${d.status}</span></td><td><button class="btn-action ${btnClass}" onclick="window.toggleBan('${id}', '${newStatus}')">${btnText}</button><button class="btn-action btn-delete" style="margin-left:8px;" onclick="window.deleteUser('${id}')"><i class="fas fa-trash-alt"></i></button></td></tr>`;
+                            tbody.innerHTML += `<tr><td><b>${id}</b></td><td style="text-transform:uppercase;">${d.role}</td><td><span class="badge ${d.status === 'active' ? 'badge-success' : 'badge-danger'}">${d.status}</span></td><td><button class="action-icon ${btnClass}" onclick="window.toggleBan('${id}', '${newStatus}')"><i class="fas ${btnIcon}"></i></button><button class="action-icon bg-red" onclick="window.deleteUser('${id}')"><i class="fas fa-trash"></i></button></td></tr>`;
                         }
                     });
                 }
@@ -511,21 +552,19 @@
             onValue(ref(db, 'tickets'), (snapshot) => {
                 const tbody = document.getElementById('chatApprovalTable');
                 tbody.innerHTML = '';
-                let hasTickets = false; let pendingCount = 0; let chatReqsCount = 0;
-
+                let pendingCount = 0; let chatReqsCount = 0;
                 if (snapshot.exists()) {
                     snapshot.forEach((child) => {
                         const id = child.key; const t = child.val();
                         if (['Pending', 'Checking', 'Processing'].includes(t.status || 'Pending')) {
-                            hasTickets = true; pendingCount++;
+                            pendingCount++;
                             if(!t.chat_approved) chatReqsCount++;
-                            const isApproved = t.chat_approved === true;
-                            const btnHtml = isApproved ? `<button class="btn-action btn-unban" onclick="window.toggleChatApproval('${id}', false)"><i class="fas fa-lock"></i> Revoke</button>` : `<button class="btn-action" style="background:var(--info); color:white;" onclick="window.toggleChatApproval('${id}', true)"><i class="fas fa-unlock"></i> Authorize Chat</button>`;
-                            tbody.innerHTML += `<tr><td style="font-weight:900; font-family:monospace; color:white;">#${id.substring(1, 7).toUpperCase()}</td><td style="font-weight:800;">${t.agent_pin || 'N/A'}</td><td><span style="color:var(--warning); font-weight:800;">${t.uid}</span><br><span style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">${t.type}</span></td><td>${btnHtml}</td></tr>`;
+                            const btnHtml = t.chat_approved ? `<button class="btn btn-outline" style="padding: 6px 12px; font-size:11px;" onclick="window.toggleChatApproval('${id}', false)"><i class="fas fa-lock"></i> Revoke</button>` : `<button class="btn btn-primary" style="padding: 6px 12px; font-size:11px;" onclick="window.toggleChatApproval('${id}', true)"><i class="fas fa-unlock"></i> Authorize</button>`;
+                            tbody.innerHTML += `<tr><td><b>#${id.substring(1, 7).toUpperCase()}</b></td><td>${t.agent_pin || 'N/A'}</td><td><span style="color:var(--accent-red);">${t.uid}</span><br><span style="font-size:11px; color:#888;">${t.type}</span></td><td>${btnHtml}</td></tr>`;
                         }
                     });
                 }
-                if(!hasTickets) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">No active tickets requiring authorization.</td></tr>';
+                if(pendingCount === 0) tbody.innerHTML = '<tr><td colspan="4" align="center">No pending tickets.</td></tr>';
                 document.getElementById('statPendingTickets').innerText = pendingCount;
                 document.getElementById('statChatReqs').innerText = chatReqsCount;
             });
@@ -533,9 +572,10 @@
             // UID REGISTRY
             document.getElementById('addUidForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const uid = document.getElementById('newAgentUid').value.trim();
+                const rawUid = document.getElementById('newAgentUid').value;
+                const uid = String(rawUid).replace(/[^a-zA-Z0-9]/g, '').toUpperCase(); 
                 await set(ref(db, `registered_uids/${uid}`), { data_status: "pending", lifetime_profit: 0 });
-                showToast(`UID ${uid} Registered.`);
+                showToast(`UID Added!`);
                 e.target.reset();
             });
 
@@ -546,8 +586,8 @@
                 if(snapshot.exists()) {
                     snapshot.forEach(child => {
                         const data = child.val();
-                        tbody.innerHTML += `<tr><td style="font-weight:900; color:white; font-family:monospace; font-size:15px;">${child.key}</td><td><span class="badge ${data.data_status==='filled'?'badge-positive':'badge-negative'}">${data.data_status}</span></td><td style="font-weight:900; color:var(--primary); font-size:15px;">₹ ${data.lifetime_profit||0}</td></tr>`;
-                        dropdown.innerHTML += `<option value="${child.key}">${child.key} (${data.data_status.toUpperCase()})</option>`;
+                        tbody.innerHTML += `<tr><td><b>${child.key}</b></td><td><span class="badge ${data.data_status==='filled'?'badge-success':'badge-danger'}">${data.data_status}</span></td><td style="color:var(--accent-green); font-weight:bold;">₹ ${data.lifetime_profit||0}</td></tr>`;
+                        dropdown.innerHTML += `<option value="${child.key}">${child.key}</option>`;
                     });
                 }
             });
@@ -563,37 +603,36 @@
                         const id = child.key, d = child.val();
                         totalRecords++;
                         globalDailyPL += parseFloat(d.d_prof || 0);
+                        
+                        let badgeClass = 'badge-success';
+                        if(String(d.status).toUpperCase().includes('NEGATIVE') || String(d.status).toUpperCase().includes('DROP')) { badgeClass = 'badge-danger'; }
 
                         tbody.innerHTML += `
                             <tr>
-                                <td class="no-export" style="position: sticky; left: 0; background: #0a0a0a; z-index: 10; border-right: 1px solid var(--border);">
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn-pin ${d.pinned ? 'active' : ''}" onclick="window.togglePin('${id}', ${!d.pinned})" title="Pin to Top"><i class="fas fa-thumbtack"></i></button>
-                                        <button class="btn-action btn-delete" onclick="window.deleteAgentData('${id}')"><i class="fas fa-trash"></i></button>
-                                    </div>
+                                <td class="no-export" style="position: sticky; left: 0; background: #fff; border-right: 1px solid #e5e7eb;">
+                                    <button class="action-icon ${d.pinned ? 'bg-blue' : 'bg-red'}" style="background: ${d.pinned ? 'var(--accent-yellow)' : '#d1d5db'}" onclick="window.togglePin('${id}', ${!d.pinned})"><i class="fas fa-thumbtack"></i></button>
+                                    <button class="action-icon bg-red" onclick="window.deleteAgentData('${id}')"><i class="fas fa-trash"></i></button>
                                 </td>
-                                <td style="font-weight: 900; color: white; font-size:15px; font-family:monospace; background: #0a0a0a; position:sticky; left:95px; z-index:9; border-right: 1px solid var(--border);">${id}</td>
-                                <td><span class="badge ${d.status === 'POSITIVE' ? 'badge-positive' : 'badge-negative'}">${d.status}</span></td>
-                                <td>${d.y_reg}</td><td style="color:var(--primary); font-weight:800;">${d.active_m}</td><td>${d.y_active}</td>
+                                <td style="font-weight: bold;">${id}</td>
+                                <td><span class="badge ${badgeClass}">${d.status}</span></td>
+                                <td>${d.y_reg}</td><td>${d.active_m}</td><td>${d.y_active}</td>
                                 <td>${d.y_daily}</td><td>${d.d_depo}</td><td>${d.d_with}</td>
-                                <td style="color:${parseFloat(d.d_prof)<0?'var(--danger)':'var(--success)'}; font-weight:900; font-size:15px;">₹ ${d.d_prof}</td>
-                                <td>${d.t_to}</td><td style="color:white; font-weight:800;">₹ ${d.o_depo}</td><td>₹ ${d.o_with}</td><td style="color:white; font-weight:800;">₹ ${d.o_prof}</td><td style="color:var(--primary); font-weight:800;">₹ ${d.avg}</td>
+                                <td style="color:${parseFloat(d.d_prof)<0?'var(--accent-red)':'var(--accent-green)'}; font-weight:bold;">₹ ${d.d_prof}</td>
+                                <td>${d.t_to}</td><td>₹ ${d.o_depo}</td><td>₹ ${d.o_with}</td><td>₹ ${d.o_prof}</td><td>₹ ${d.avg}</td>
                                 <td>${d.depo_1}</td><td>${d.depo_2}</td><td>${d.depo_3}</td><td>₹ ${d.p_womb}</td><td>${d.lot_per}%</td>
                             </tr>
                         `;
                     });
-                } else { tbody.innerHTML = '<tr><td colspan="20" style="text-align:center; padding: 40px;">Database Empty.</td></tr>'; }
+                } else { tbody.innerHTML = '<tr><td colspan="20" align="center">Database Empty.</td></tr>'; }
 
                 document.getElementById('statTotalAgents').innerText = totalRecords;
                 document.getElementById('statGlobalPL').innerText = `₹ ${globalDailyPL.toFixed(2)}`;
             });
-        } // End initHeadData
+        }
 
-        // ================= BULK EXCEL UPLOAD LOGIC =================
-        
-        // 1. Download Template
+        // ================= SUPER-RESILIENT EXCEL UPLOAD =================
         window.downloadExcelTemplate = function() {
-            const headers = ["UID", "STATUS", "Y_REG", "ACTIVE_M", "Y_ACTIVE", "Y_DAILY_DEP", "DAILY_DEP", "DAILY_WITH", "DAILY_PROF", "TOTAL_TO", "O_DEPO", "O_WITH", "O_PROF", "AVG_RCHG", "DEPO_1", "DEPO_2", "DEPO_3", "PROF_WOMB", "LOTTERY_PER"];
+            const headers = ["MEMBER ID", "DATA STATUS", "Y-REGISTERED", "ACTIVE MEMBER", "Y-ACTIVE", "Y-DAILY DEPOSIT", "DAILY DEPOSIT", "DAILY WITHDRAWAL", "DAILY PROFITS", "TOTAL TO", "OVERALL DEPOSIT", "OVERALL WITHDRAW", "OVERALL PROFITS", "AVERAGE RECHARGE 800% MIN.", "1ST DEPO", "2ND DEPO", "3RD DEPO", "PROFITS w/o MB", "LOTTERY T.O %"];
             const ws = XLSX.utils.aoa_to_sheet([headers]);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Agent_Data");
@@ -601,12 +640,31 @@
             showToast("Template Downloaded!");
         };
 
-        // 2. Handle Upload & Sync
-        window.handleExcelUpload = function(event) {
+        window.handleExcelUpload = async function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            showToast("Syncing data with Firebase...", "success");
+            showToast("Scanning File...");
+
+            let myTeamUIDs = [];
+            try {
+                const uidsSnap = await get(ref(db, 'registered_uids'));
+                if(uidsSnap.exists()) {
+                    uidsSnap.forEach(child => {
+                        let cleanMyUid = String(child.key).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                        myTeamUIDs.push(cleanMyUid);
+                    });
+                }
+            } catch(e) {
+                showToast("Error fetching team list.", "error");
+                return;
+            }
+
+            if(myTeamUIDs.length === 0) {
+                showToast("Registry is empty!", "error");
+                document.getElementById('excelFileInput').value = '';
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -614,69 +672,129 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rawData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
                     
-                    // Convert Excel to JSON Array
-                    const excelData = XLSX.utils.sheet_to_json(firstSheet);
+                    if(rawData.length === 0) { showToast("File empty!", "error"); return; }
+
+                    let headerRowIndex = -1;
+                    let excelHeaders = [];
                     
-                    if(excelData.length === 0) {
-                        showToast("File is empty!", "error");
-                        return;
-                    }
-
-                    // Loop through each row and push to Firebase
-                    for (let row of excelData) {
-                        if(!row.UID) continue; // Skip if UID is missing
-
-                        let uid = String(row.UID).trim();
-                        let payload = {
-                            status: row.STATUS || "POSITIVE",
-                            y_reg: row.Y_REG || 0,
-                            active_m: row.ACTIVE_M || 0,
-                            y_active: row.Y_ACTIVE || "-",
-                            y_daily: row.Y_DAILY_DEP || 0,
-                            d_depo: row.DAILY_DEP || 0,
-                            d_with: row.DAILY_WITH || 0,
-                            d_prof: row.DAILY_PROF || 0,
-                            t_to: row.TOTAL_TO || 0,
-                            o_depo: row.O_DEPO || 0,
-                            o_with: row.O_WITH || 0,
-                            o_prof: row.O_PROF || 0,
-                            avg: row.AVG_RCHG || 0,
-                            depo_1: row.DEPO_1 || 0,
-                            depo_2: row.DEPO_2 || 0,
-                            depo_3: row.DEPO_3 || 0,
-                            p_womb: row.PROF_WOMB || 0,
-                            lot_per: row.LOTTERY_PER || 0,
-                            pinned: false
-                        };
-
-                        // 1. Set 19 column data
-                        await set(ref(db, 'agent_data/' + uid), payload);
+                    // 🔥 BULLETPROOF HEADER FINDER
+                    // Scans first 15 rows. Cleans \n and spaces to ensure it catches "MEMBER ID"
+                    for(let i=0; i < Math.min(rawData.length, 15); i++) {
+                        let rowVals = rawData[i].map(v => String(v).replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase());
                         
-                        // 2. Update Registry Lifetime profit
-                        const uidRef = ref(db, `registered_uids/${uid}`);
-                        let snap = await get(uidRef);
-                        let currentLifetime = snap.exists() ? (snap.val().lifetime_profit || 0) : 0;
-                        await update(uidRef, { data_status: "filled", lifetime_profit: currentLifetime + parseFloat(payload.d_prof) });
+                        let hasIdColumn = rowVals.some(val => val.includes('MEMBER ID') || val === 'MEMBER' || val === 'UID' || val === 'AGENT ID' || val === 'ID');
+
+                        if(hasIdColumn) {
+                            headerRowIndex = i;
+                            excelHeaders = rowVals;
+                            break;
+                        }
                     }
 
-                    showToast(`Successfully synced ${excelData.length} Agents!`);
-                    document.getElementById('excelFileInput').value = ''; // Reset input
+                    if(headerRowIndex === -1) { 
+                        showToast("Error: No 'MEMBER ID' column found in file!", "error"); 
+                        return; 
+                    }
+
+                    let normHeaders = {};
+                    excelHeaders.forEach((cleanH, index) => {
+                        if(cleanH) normHeaders[cleanH] = index; 
+                    });
+
+                    let uidIndex = undefined;
+                    for(let h of Object.keys(normHeaders)) {
+                        if(h.includes('MEMBER ID') || h === 'MEMBER' || h === 'UID' || h === 'AGENT ID' || h === 'ID') {
+                            uidIndex = normHeaders[h];
+                            break;
+                        }
+                    }
+
+                    if (uidIndex === undefined) { 
+                        showToast("Error: UID column not mapped properly!", "error"); 
+                        return; 
+                    }
+
+                    let syncCount = 0;
+
+                    // Parse Data
+                    for(let i = headerRowIndex + 1; i < rawData.length; i++) {
+                        let row = rawData[i];
+                        let rawUid = row[uidIndex];
+                        if(!rawUid) continue;
+
+                        let uid = String(rawUid).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                        
+                        if(myTeamUIDs.includes(uid)) {
+                            const getV = (names) => {
+                                for(let n of names) {
+                                    if(normHeaders[n] !== undefined) {
+                                        let v = row[normHeaders[n]];
+                                        return v === "" || v === undefined || isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+                                    }
+                                } return 0;
+                            };
+                            const getStr = (names, def="-") => {
+                                for(let n of names) {
+                                    if(normHeaders[n] !== undefined) {
+                                        let v = row[normHeaders[n]];
+                                        return v ? String(v).trim() : def;
+                                    }
+                                } return def;
+                            };
+
+                            let payload = {
+                                status: getStr(['DATA STATUS', 'STATUS'], "POSITIVE"),
+                                y_reg: getV(['Y-REGISTERED', 'Y_REG']),
+                                active_m: getV(['ACTIVE MEMBER', 'ACTIVE_M']),
+                                y_active: getStr(['Y-ACTIVE', 'Y_ACTIVE'], "-"),
+                                y_daily: getV(['Y-DAILY DEPOSIT', 'Y-DAILY DEP']),
+                                d_depo: getV(['DAILY DEPOSIT', 'DAILY DEP']),
+                                d_with: getV(['DAILY WITHDRAWAL', 'DAILY WITHDRAW']),
+                                d_prof: getV(['DAILY PROFITS', 'DAILY PROFIT']),
+                                t_to: getV(['TOTAL TO', 'TOTAL_TO']),
+                                o_depo: getV(['OVERALL DEPOSIT', 'OVERALL DEP']),
+                                o_with: getV(['OVERALL WITHDRAW', 'OVERALL WITHDRAWAL']),
+                                o_prof: getV(['OVERALL PROFITS', 'OVERALL PROFIT']),
+                                avg: getV(['AVERAGE RECHARGE 800% MIN.', 'AVERAGE RECHARGE']),
+                                depo_1: getV(['1ST DEPO', '1ST DEPOSIT']),
+                                depo_2: getV(['2ND DEPO', '2ND DEPOSIT']),
+                                depo_3: getV(['3RD DEPO', '3RD DEPOSIT']),
+                                p_womb: getV(['PROFITS W/O MB', 'PROFITS W/O']),
+                                lot_per: getV(['LOTTERY T.O %', 'LOTTERY T.O']),
+                                pinned: false
+                            };
+
+                            if(payload.status === "-") payload.status = "POSITIVE";
+
+                            await set(ref(db, 'agent_data/' + uid), payload);
+                            const uidRef = ref(db, `registered_uids/${uid}`);
+                            let snap = await get(uidRef);
+                            let clife = snap.exists() ? (parseFloat(snap.val().lifetime_profit) || 0) : 0;
+                            await update(uidRef, { data_status: "filled", lifetime_profit: clife + payload.d_prof });
+                            syncCount++;
+                        }
+                    }
+
+                    if(syncCount > 0) showToast(`Synced ${syncCount} Agents!`, "success");
+                    else showToast(`No matching UIDs found!`, "error");
+                    document.getElementById('excelFileInput').value = ''; 
                 } catch(err) {
-                    showToast("Error processing Excel file.", "error");
-                    console.error(err);
+                    showToast("System Error: " + err.message, "error");
                 }
             };
+            reader.onerror = () => showToast("Read failed.", "error");
             reader.readAsArrayBuffer(file);
         };
 
-        // MANUAL SINGLE ENTRY
+        // MANUAL ENTRY
         document.getElementById('dataEntryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('c_id').value;
-            if(!id) return showToast("Select a UID First", "error");
+            if(!id) return;
             const payload = {
-                status: document.getElementById('c_status').value,
+                status: document.getElementById('c_status').value || "POSITIVE",
                 y_reg: document.getElementById('c_yreg').value || 0,
                 active_m: document.getElementById('c_activem').value || 0,
                 y_active: document.getElementById('c_yactive').value || "-",
@@ -699,19 +817,18 @@
             await set(ref(db, 'agent_data/' + id), payload);
             const uidRef = ref(db, `registered_uids/${id}`);
             get(uidRef).then((snap) => {
-                let currentLifetime = snap.exists() ? (snap.val().lifetime_profit || 0) : 0;
-                update(uidRef, { data_status: "filled", lifetime_profit: currentLifetime + parseFloat(payload.d_prof) });
+                let cl = snap.exists() ? (snap.val().lifetime_profit || 0) : 0;
+                update(uidRef, { data_status: "filled", lifetime_profit: cl + parseFloat(payload.d_prof) });
             });
-            showToast("Ledger Synced to Core Database!");
+            showToast("Saved Manual Entry!");
             e.target.reset();
         });
 
-        // Global functions
-        window.toggleBan = async function(id, newStatus) { await update(ref(db, 'users/' + id), { status: newStatus }); showToast(`User ${newStatus === 'banned' ? 'Suspended' : 'Restored'}`); };
-        window.deleteUser = async function(id) { if(confirm(`Eradicate user ID: ${id}?`)) { await remove(ref(db, 'users/' + id)); showToast(`Eradicated!`, "error"); } };
-        window.toggleChatApproval = async function(ticketId, status) { await update(ref(db, 'tickets/' + ticketId), { chat_approved: status }); showToast(status ? "Chat Authorized!" : "Chat Locked"); };
-        window.togglePin = async function(id, status) { await update(ref(db, 'agent_data/' + id), { pinned: status }); showToast(status ? `Rigged to Top!` : `Unpinned`); }
-        window.deleteAgentData = async function(id) { if(confirm(`Erase ledger for Agent: ${id}?`)) { await remove(ref(db, 'agent_data/' + id)); showToast(`Erased!`, "error"); } };
+        window.toggleBan = async function(id, status) { await update(ref(db, 'users/' + id), { status: status }); showToast(`Updated User!`); };
+        window.deleteUser = async function(id) { if(confirm(`Delete user ${id}?`)) { await remove(ref(db, 'users/' + id)); showToast(`Deleted!`, "error"); } };
+        window.toggleChatApproval = async function(ticketId, status) { await update(ref(db, 'tickets/' + ticketId), { chat_approved: status }); showToast("Chat Configured"); };
+        window.togglePin = async function(id, status) { await update(ref(db, 'agent_data/' + id), { pinned: status }); }
+        window.deleteAgentData = async function(id) { if(confirm(`Erase ledger?`)) { await remove(ref(db, 'agent_data/' + id)); } };
 
         window.searchTable = function() {
             let input = document.getElementById("searchInput").value.toUpperCase();
@@ -727,29 +844,25 @@
             let rows = document.querySelectorAll("#dataTable tr");
             for (let i = 0; i < rows.length; i++) {
                 let row = [], cols = rows[i].querySelectorAll("td, th");
-                for (let j = 1; j < cols.length; j++) { 
-                    let data = cols[j].innerText.replace(/,/g, ''); 
-                    row.push('"' + data + '"');
-                }
+                for (let j = 1; j < cols.length; j++) { row.push('"' + cols[j].innerText.replace(/,/g, '') + '"'); }
                 if(row.length > 0) csv.push(row.join(","));
             }
             let csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
-            let downloadLink = document.createElement("a");
-            downloadLink.download = filename; downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = "none"; document.body.appendChild(downloadLink); downloadLink.click();
-            showToast("Exported Successfully!");
+            let link = document.createElement("a");
+            link.download = filename; link.href = window.URL.createObjectURL(csvFile);
+            document.body.appendChild(link); link.click();
         };
 
         window.triggerMonthlyReset = async function() {
-            if(prompt("Type 'WIPE' to confirm full system wipe:") === 'WIPE') {
+            if(prompt("Type 'WIPE':") === 'WIPE') {
                 await remove(ref(db, 'agent_data'));
                 get(ref(db, 'registered_uids')).then((snap) => {
                     if(snap.exists()) {
                         snap.forEach(child => { update(ref(db, `registered_uids/${child.key}`), { data_status: "pending" }); });
                     }
                 });
-                showToast("System Wipe Complete.");
-            } else showToast("Wipe Aborted.", "error");
+                showToast("System Reset Complete.");
+            }
         };
     </script>
 </body>
