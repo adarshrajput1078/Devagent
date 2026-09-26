@@ -125,6 +125,7 @@
         .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid var(--accent-red); }
 
         .action-icon { width: 30px; height: 30px; border-radius: 4px; border: none; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; color: white; font-size: 12px; margin-right: 5px; }
+        .bg-red { background: var(--accent-red); } .bg-blue { background: var(--header-bg); }
 
         /* EXCEL IMPORT AREA */
         .upload-area { border: 2px dashed #d1d5db; border-radius: 8px; padding: 40px 20px; text-align: center; background: #f9fafb; margin-bottom: 20px; transition: 0.3s; }
@@ -323,7 +324,7 @@
                             <label>Agent UID</label>
                             <div style="display:flex; gap:10px;">
                                 <input type="text" id="newAgentUid" class="form-control" placeholder="Enter Exact Member ID" required>
-                                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Add</button>
+                                <button type="submit" class="btn btn-success" style="width:auto;"><i class="fas fa-plus"></i> Add</button>
                             </div>
                         </div>
                     </form>
@@ -339,7 +340,7 @@
                 </div>
             </div>
 
-            <!-- 6. SMART EXCEL IMPORT -->
+            <!-- 6. EXCEL IMPORT -->
             <div id="tab-dataentry" class="app-tab hidden">
                 <h2 class="page-title"><i class="fas fa-file-excel"></i> Data Synchronization</h2>
                 
@@ -349,9 +350,9 @@
                     <p>Upload the Head Manager's Excel file. The system will automatically scan, clean, and extract ONLY the agents present in your Whitelist.</p>
                     
                     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-outline" onclick="window.downloadExcelTemplate()"><i class="fas fa-download"></i> Get Template</button>
+                        <button class="btn btn-outline" style="width:auto;" onclick="window.downloadExcelTemplate()"><i class="fas fa-download"></i> Get Template</button>
                         <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display: none;" onchange="window.handleExcelUpload(event)">
-                        <button class="btn btn-primary" onclick="document.getElementById('excelFileInput').click()"><i class="fas fa-file-import"></i> Select & Upload File</button>
+                        <button class="btn btn-primary" style="width:auto;" onclick="document.getElementById('excelFileInput').click()"><i class="fas fa-file-import"></i> Select & Upload File</button>
                     </div>
                 </div>
 
@@ -400,8 +401,8 @@
                     <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
                         <input type="text" id="searchInput" class="form-control" style="max-width: 300px;" placeholder="Search UID..." onkeyup="window.searchTable()">
                         <div style="display:flex; gap:10px;">
-                            <button class="btn btn-outline" onclick="window.exportToCSV('Admin_Report.csv')"><i class="fas fa-file-csv"></i> CSV</button>
-                            <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                            <button class="btn btn-outline" style="width:auto;" onclick="window.exportToCSV('Admin_Report.csv')"><i class="fas fa-file-csv"></i> CSV</button>
+                            <button class="btn btn-outline" style="width:auto;" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
                         </div>
                     </div>
 
@@ -429,9 +430,9 @@
             <div id="tab-settings" class="app-tab hidden">
                 <h2 class="page-title"><i class="fas fa-cogs"></i> System Settings</h2>
                 <div class="card fade-in" style="border: 1px solid var(--accent-red);">
-                    <div class="card-header" style="color: var(--accent-red);">Danger Zone: Monthly Wipe</div>
-                    <p style="font-size: 14px; color: #555; margin-bottom: 20px;">Executing this action will delete all 19-column data for the current month and reset tracking to "Pending". Lifetime profits in the Registry remain safe.</p>
-                    <button class="btn btn-primary" style="background: var(--accent-red);" onclick="window.triggerMonthlyReset()"><i class="fas fa-trash-alt"></i> Execute Master Reset</button>
+                    <div class="card-header" style="color: var(--accent-red);">Danger Zone: Hard System Wipe</div>
+                    <p style="font-size: 14px; color: #555; margin-bottom: 20px;"><b>WARNING:</b> This will completely erase ALL Agent Data, Lifetime Profits, and completely clear the UID Whitelist Registry. Everything will be reset to zero.</p>
+                    <button class="btn btn-primary" style="background: var(--accent-red);" onclick="window.triggerMonthlyReset()"><i class="fas fa-trash-alt"></i> Execute Hard Reset</button>
                 </div>
             </div>
 
@@ -630,7 +631,7 @@
             });
         }
 
-        // ================= SUPER-RESILIENT EXCEL UPLOAD =================
+        // ================= SUPER ULTRA-FUZZY EXCEL UPLOAD =================
         window.downloadExcelTemplate = function() {
             const headers = ["MEMBER ID", "DATA STATUS", "Y-REGISTERED", "ACTIVE MEMBER", "Y-ACTIVE", "Y-DAILY DEPOSIT", "DAILY DEPOSIT", "DAILY WITHDRAWAL", "DAILY PROFITS", "TOTAL TO", "OVERALL DEPOSIT", "OVERALL WITHDRAW", "OVERALL PROFITS", "AVERAGE RECHARGE 800% MIN.", "1ST DEPO", "2ND DEPO", "3RD DEPO", "PROFITS w/o MB", "LOTTERY T.O %"];
             const ws = XLSX.utils.aoa_to_sheet([headers]);
@@ -679,8 +680,7 @@
                     let headerRowIndex = -1;
                     let excelHeaders = [];
                     
-                    // 🔥 BULLETPROOF HEADER FINDER
-                    // Scans first 15 rows. Cleans \n and spaces to ensure it catches "MEMBER ID"
+                    // 🔥 FIND HEADER ROW (REMOVES ALL KINDS OF LINE BREAKS AND SPACES)
                     for(let i=0; i < Math.min(rawData.length, 15); i++) {
                         let rowVals = rawData[i].map(v => String(v).replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase());
                         
@@ -727,42 +727,48 @@
                         let uid = String(rawUid).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
                         
                         if(myTeamUIDs.includes(uid)) {
-                            const getV = (names) => {
-                                for(let n of names) {
-                                    if(normHeaders[n] !== undefined) {
-                                        let v = row[normHeaders[n]];
-                                        return v === "" || v === undefined || isNaN(parseFloat(v)) ? 0 : parseFloat(v);
-                                    }
-                                } return 0;
+                            
+                            // 🔥 ULTRA-FUZZY MATCHER (Uses .find with .includes for maximum safety)
+                            const getV = (keywords) => {
+                                let matchedKey = Object.keys(normHeaders).find(h => keywords.some(k => h.includes(k)));
+                                if(matchedKey !== undefined) {
+                                    let val = row[normHeaders[matchedKey]];
+                                    return val === "" || val === undefined || isNaN(parseFloat(val)) ? 0 : parseFloat(val);
+                                }
+                                return 0;
                             };
-                            const getStr = (names, def="-") => {
-                                for(let n of names) {
-                                    if(normHeaders[n] !== undefined) {
-                                        let v = row[normHeaders[n]];
-                                        return v ? String(v).trim() : def;
-                                    }
-                                } return def;
+
+                            const getStr = (keywords, def="-") => {
+                                let matchedKey = Object.keys(normHeaders).find(h => keywords.some(k => h.includes(k)));
+                                if(matchedKey !== undefined) {
+                                    let val = row[normHeaders[matchedKey]];
+                                    return val ? String(val).trim() : def;
+                                }
+                                return def;
                             };
 
                             let payload = {
                                 status: getStr(['DATA STATUS', 'STATUS'], "POSITIVE"),
-                                y_reg: getV(['Y-REGISTERED', 'Y_REG']),
-                                active_m: getV(['ACTIVE MEMBER', 'ACTIVE_M']),
-                                y_active: getStr(['Y-ACTIVE', 'Y_ACTIVE'], "-"),
-                                y_daily: getV(['Y-DAILY DEPOSIT', 'Y-DAILY DEP']),
+                                y_reg: getV(['Y-REGISTERED', 'Y_REG', 'Y REG']),
+                                active_m: getV(['ACTIVE MEMBER', 'ACTIVE_M', 'ACTIVE M']),
+                                y_active: getStr(['Y-ACTIVE', 'Y_ACTIVE', 'Y ACTIVE'], "-"),
+                                y_daily: getV(['Y-DAILY DEPOSIT', 'Y-DAILY DEP', 'Y DAILY DEPOSIT']),
                                 d_depo: getV(['DAILY DEPOSIT', 'DAILY DEP']),
-                                d_with: getV(['DAILY WITHDRAWAL', 'DAILY WITHDRAW']),
-                                d_prof: getV(['DAILY PROFITS', 'DAILY PROFIT']),
+                                d_with: getV(['DAILY WITHDRAWAL', 'DAILY WITHDRAW', 'DAILY WITH']),
+                                d_prof: getV(['DAILY PROFITS', 'DAILY PROFIT', 'DAILY PROF']),
                                 t_to: getV(['TOTAL TO', 'TOTAL_TO']),
                                 o_depo: getV(['OVERALL DEPOSIT', 'OVERALL DEP']),
                                 o_with: getV(['OVERALL WITHDRAW', 'OVERALL WITHDRAWAL']),
                                 o_prof: getV(['OVERALL PROFITS', 'OVERALL PROFIT']),
-                                avg: getV(['AVERAGE RECHARGE 800% MIN.', 'AVERAGE RECHARGE']),
-                                depo_1: getV(['1ST DEPO', '1ST DEPOSIT']),
-                                depo_2: getV(['2ND DEPO', '2ND DEPOSIT']),
-                                depo_3: getV(['3RD DEPO', '3RD DEPOSIT']),
-                                p_womb: getV(['PROFITS W/O MB', 'PROFITS W/O']),
-                                lot_per: getV(['LOTTERY T.O %', 'LOTTERY T.O']),
+                                
+                                // FIX: Captures "AVERAGE RECHARGE: 800% MIN.", "AVG RECHARGE", "800%"
+                                avg: getV(['800%', 'AVERAGE RECHARGE', 'AVG RECHARGE']), 
+                                
+                                depo_1: getV(['1ST DEPO', '1ST DEPOSIT', '1ST']),
+                                depo_2: getV(['2ND DEPO', '2ND DEPOSIT', '2ND']),
+                                depo_3: getV(['3RD DEPO', '3RD DEPOSIT', '3RD']),
+                                p_womb: getV(['PROFITS W/O MB', 'PROFITS W/O', 'WOMB', 'W/O']),
+                                lot_per: getV(['LOTTERY T.O %', 'LOTTERY T.O', 'LOTTERY %']),
                                 pinned: false
                             };
 
@@ -781,7 +787,8 @@
                     else showToast(`No matching UIDs found!`, "error");
                     document.getElementById('excelFileInput').value = ''; 
                 } catch(err) {
-                    showToast("System Error: " + err.message, "error");
+                    showToast("Code Error: " + err.message, "error");
+                    console.error(err);
                 }
             };
             reader.onerror = () => showToast("Read failed.", "error");
@@ -853,15 +860,14 @@
             document.body.appendChild(link); link.click();
         };
 
+        // 🔥 HARD RESET LOGIC (WIPES AGENT DATA + REGISTRY COMPLETELY)
         window.triggerMonthlyReset = async function() {
-            if(prompt("Type 'WIPE':") === 'WIPE') {
-                await remove(ref(db, 'agent_data'));
-                get(ref(db, 'registered_uids')).then((snap) => {
-                    if(snap.exists()) {
-                        snap.forEach(child => { update(ref(db, `registered_uids/${child.key}`), { data_status: "pending" }); });
-                    }
-                });
-                showToast("System Reset Complete.");
+            if(prompt("Type 'WIPE' to confirm FULL system wipe (This deletes all Data & UIDs):") === 'WIPE') {
+                await remove(ref(db, 'agent_data')); 
+                await remove(ref(db, 'registered_uids')); 
+                showToast("Full System Wipe Complete. Everything is fresh.");
+            } else {
+                showToast("Wipe Aborted.", "error");
             }
         };
     </script>
